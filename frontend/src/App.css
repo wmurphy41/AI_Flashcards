@@ -155,16 +155,115 @@
   color: white;
   border: none;
   border-radius: 8px;
-  cursor: not-allowed;
-  opacity: 0.6;
+  cursor: pointer;
   margin-top: 2rem;
+  transition: background-color 0.2s;
 }
 
-.coming-soon {
+.study-button:hover {
+  background-color: #535bf2;
+}
+
+.study-button:active {
+  background-color: #4c54e0;
+}
+
+/* Study Session Styles */
+.study-container {
+  padding: 0;
+  max-width: 100%;
+}
+
+.study-header {
+  padding: 1rem;
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #333;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.study-title {
+  flex: 1;
   text-align: center;
+  min-width: 200px;
+}
+
+.study-title h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #fff;
+}
+
+.cycle-indicator {
+  font-size: 0.9rem;
   color: #888;
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
+  margin: 0.25rem 0 0 0;
+}
+
+.progress-indicator {
+  font-size: 0.9rem;
+  color: #888;
+  padding: 0.25rem 0.75rem;
+  background-color: #242424;
+  border-radius: 12px;
+}
+
+.study-content {
+  padding: 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+}
+
+/* Results Styles */
+.results-container {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.results-container h2 {
+  font-size: 2rem;
+  margin: 0 0 2rem 0;
+  color: #fff;
+}
+
+.score-section {
+  margin: 2rem 0;
+}
+
+.score-main {
+  margin-bottom: 1rem;
+}
+
+.score-percent {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #646cff;
+  display: block;
+  line-height: 1;
+}
+
+.score-label {
+  font-size: 1.1rem;
+  color: #aaa;
+  margin: 0.5rem 0 0 0;
+}
+
+.score-detail {
+  font-size: 1rem;
+  color: #888;
+  margin: 1rem 0;
+}
+
+.cycles-completed {
+  font-size: 0.9rem;
+  color: #888;
+  margin: 1rem 0;
 }
 
 /* Mobile-first responsive */
@@ -227,5 +326,22 @@
     background-color: #f9f9f9;
     border-color: #ddd;
     color: #213547;
+  }
+
+  .study-header {
+    background-color: #f9f9f9;
+    border-bottom-color: #ddd;
+  }
+
+  .study-title h2 {
+    color: #213547;
+  }
+
+  .results-container h2 {
+    color: #213547;
+  }
+
+  .score-percent {
+    color: #646cff;
   }
 }

@@ -1,7 +1,7 @@
 {
   "id": "french-numbers",
   "title": "French Numbers",
-  "description": "Learn numbers 1-10 in French",
+  "description": "French numbers from 1 - 10 with French on the front and English on the back.",
   "cards": [
     { "id": "n1", "front": "un", "back": "one" },
     { "id": "n2", "front": "deux", "back": "two" },

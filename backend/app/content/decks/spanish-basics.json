@@ -1,7 +1,7 @@
 {
   "id": "spanish-basics",
   "title": "Spanish Basics",
-  "description": "Common greetings and phrases",
+  "description": "Common greetings and phrases with Spanish on the front and English on the back.",
   "cards": [
     { "id": "c1", "front": "hola", "back": "hello" },
     { "id": "c2", "front": "adiós", "back": "goodbye" },
