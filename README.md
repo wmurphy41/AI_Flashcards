@@ -70,13 +70,58 @@ If you encounter execution policy errors, run:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
+## API Endpoints
+
+### Health Check
+```powershell
+curl http://localhost:8000/api/health
+```
+
+### List All Decks
+```powershell
+curl http://localhost:8000/api/decks
+```
+
+Returns a list of deck summaries with `id`, `title`, `description`, and `card_count`.
+
+### Get Deck Details
+```powershell
+curl http://localhost:8000/api/decks/spanish-basics
+```
+
+Returns full deck details including all cards. Returns 404 if deck not found.
+
+## Flashcard Decks
+
+Deck JSON files are located in `backend/app/content/decks/`. Each deck file must:
+- Have a `.json` extension
+- Match the schema: `id`, `title`, `description` (optional), and `cards[]`
+- Have `deck.id` matching the filename stem (e.g., `spanish-basics.json` → `id: "spanish-basics"`)
+- Have unique `card.id` values within each deck
+
+Example deck structure:
+```json
+{
+  "id": "spanish-basics",
+  "title": "Spanish Basics",
+  "description": "Common greetings and phrases",
+  "cards": [
+    { "id": "c1", "front": "hola", "back": "hello" }
+  ]
+}
+```
+
 ## Project Structure
 
 ```
 /
 ├── backend/          # FastAPI application
 │   ├── app/
-│   │   └── main.py
+│   │   ├── content/
+│   │   │   └── decks/    # Deck JSON files
+│   │   ├── main.py
+│   │   ├── schemas.py
+│   │   └── content_loader.py
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── frontend/         # Vite React+TypeScript application

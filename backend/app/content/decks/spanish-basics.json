@@ -1,0 +1,13 @@
+{
+  "id": "spanish-basics",
+  "title": "Spanish Basics",
+  "description": "Common greetings and phrases",
+  "cards": [
+    { "id": "c1", "front": "hola", "back": "hello" },
+    { "id": "c2", "front": "adiós", "back": "goodbye" },
+    { "id": "c3", "front": "por favor", "back": "please" },
+    { "id": "c4", "front": "gracias", "back": "thank you" },
+    { "id": "c5", "front": "buenos días", "back": "good morning" }
+  ]
+}
+

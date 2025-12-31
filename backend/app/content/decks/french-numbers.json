@@ -1,0 +1,18 @@
+{
+  "id": "french-numbers",
+  "title": "French Numbers",
+  "description": "Learn numbers 1-10 in French",
+  "cards": [
+    { "id": "n1", "front": "un", "back": "one" },
+    { "id": "n2", "front": "deux", "back": "two" },
+    { "id": "n3", "front": "trois", "back": "three" },
+    { "id": "n4", "front": "quatre", "back": "four" },
+    { "id": "n5", "front": "cinq", "back": "five" },
+    { "id": "n6", "front": "six", "back": "six" },
+    { "id": "n7", "front": "sept", "back": "seven" },
+    { "id": "n8", "front": "huit", "back": "eight" },
+    { "id": "n9", "front": "neuf", "back": "nine" },
+    { "id": "n10", "front": "dix", "back": "ten" }
+  ]
+}
+
