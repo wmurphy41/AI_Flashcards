@@ -74,6 +74,11 @@ function App() {
 
   const handleStartStudy = () => {
     if (selectedDeck) {
+      // Handle edge case: deck with no cards
+      if (selectedDeck.cards.length === 0) {
+        setError('This deck has no cards to study.')
+        return
+      }
       const session = initSession(selectedDeck.cards)
       setSessionState(session)
       setView('study')
@@ -105,9 +110,57 @@ function App() {
   }
 
   if (view === 'study' && sessionState && selectedDeck) {
+    // Handle edge case: no cards in current cycle queue
+    if (sessionState.cycleQueue.length === 0) {
+      return (
+        <div className="app-container study-container">
+          <div className="study-header">
+            <button className="back-button" onClick={handleBack}>
+              ← Back
+            </button>
+            <div className="study-title">
+              <h2>{selectedDeck.title}</h2>
+            </div>
+          </div>
+          <div className="study-content">
+            <div className="empty-state">
+              <p>No cards available in this cycle.</p>
+              <button className="study-button" onClick={handleBack}>
+                Back to Deck
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     const currentCard = sessionState.cycleQueue[sessionState.currentCardIndex]
     const progress = sessionState.currentCardIndex + 1
     const total = sessionState.cycleQueue.length
+
+    // Safety check: ensure currentCard exists
+    if (!currentCard) {
+      return (
+        <div className="app-container study-container">
+          <div className="study-header">
+            <button className="back-button" onClick={handleBack}>
+              ← Back
+            </button>
+            <div className="study-title">
+              <h2>{selectedDeck.title}</h2>
+            </div>
+          </div>
+          <div className="study-content">
+            <div className="empty-state">
+              <p>Session completed.</p>
+              <button className="study-button" onClick={handleBack}>
+                Back to Deck
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
 
     return (
       <div className="app-container study-container">
@@ -116,7 +169,7 @@ function App() {
             ← Back
           </button>
           <div className="study-title">
-            <h2>{selectedDeck.title}</h2>
+            <h2>{selectedDeck.title || 'Study Session'}</h2>
             <p className="cycle-indicator">Cycle {sessionState.cycle} of 4</p>
           </div>
           <div className="progress-indicator">
@@ -124,15 +177,11 @@ function App() {
           </div>
         </div>
         <div className="study-content">
-          {currentCard ? (
-            <CardView
-              card={currentCard}
-              onSwipe={(direction) => handleCardAnswer(direction === 'right')}
-              onTap={handleCardTap}
-            />
-          ) : (
-            <p>Loading card...</p>
-          )}
+          <CardView
+            card={currentCard}
+            onSwipe={(direction) => handleCardAnswer(direction === 'right')}
+            onTap={handleCardTap}
+          />
         </div>
       </div>
     )
@@ -140,6 +189,7 @@ function App() {
 
   if (view === 'results' && sessionState) {
     const score = calculateCycle1Score(sessionState)
+    const remainingIncorrect = sessionState.incorrectCardIds.size
 
     return (
       <div className="app-container">
@@ -166,6 +216,11 @@ function App() {
                 Completed {sessionState.cycle} cycle{sessionState.cycle !== 1 ? 's' : ''}
               </p>
             )}
+            {remainingIncorrect > 0 && (
+              <p className="remaining-incorrect">
+                {remainingIncorrect} card{remainingIncorrect !== 1 ? 's' : ''} still need practice
+              </p>
+            )}
             <button className="study-button" onClick={handleBack}>
               Back to Deck
             </button>
@@ -186,8 +241,16 @@ function App() {
         </div>
         <div className="content">
           {loading && <p className="loading">Loading deck...</p>}
-          {error && <p className="error">Error: {error}</p>}
-          {selectedDeck && !loading && (
+          {error && (
+            <div className="error-container">
+              <p className="error">Error loading deck</p>
+              <p className="error-detail">{error}</p>
+              <button className="study-button" onClick={handleBack}>
+                Back to List
+              </button>
+            </div>
+          )}
+          {selectedDeck && !loading && !error && (
             <div className="deck-detail">
               <h2>{selectedDeck.title}</h2>
               {selectedDeck.description && (
@@ -211,9 +274,15 @@ function App() {
                   )}
                 </ul>
               </div>
-              <button className="study-button" onClick={handleStartStudy}>
-                Start Study Session
-              </button>
+              {selectedDeck.cards.length === 0 ? (
+                <div className="empty-deck-message">
+                  <p>This deck has no cards to study.</p>
+                </div>
+              ) : (
+                <button className="study-button" onClick={handleStartStudy}>
+                  Start Study Session
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -226,10 +295,18 @@ function App() {
       <div className="header">
         <h1>AI Flashcards</h1>
       </div>
-      <div className="content">
-        {loading && <p className="loading">Loading decks...</p>}
-        {error && <p className="error">Error: {error}</p>}
-        {!loading && !error && (
+        <div className="content">
+          {loading && <p className="loading">Loading decks...</p>}
+          {error && (
+            <div className="error-container">
+              <p className="error">Error loading decks</p>
+              <p className="error-detail">{error}</p>
+              <button className="study-button" onClick={() => window.location.reload()}>
+                Retry
+              </button>
+            </div>
+          )}
+          {!loading && !error && (
           <div className="deck-list">
             {decks.length === 0 ? (
               <p>No decks available</p>

@@ -14,8 +14,15 @@ export type SessionAction =
 
 /**
  * Build the queue of cards for a cycle.
- * Cycle 1: all cards in original order
- * Cycles 2-4: only incorrect cards, in same relative order as original deck
+ * 
+ * Cycle 1: Returns all cards in their original order from the deck.
+ * Cycles 2-4: Returns only cards that were marked incorrect, maintaining
+ *              the same relative order as they appeared in the original deck.
+ * 
+ * @param allCards - All cards from the deck in original order
+ * @param incorrectCardIds - Set of card IDs that were answered incorrectly
+ * @param cycle - Current cycle number (1-4)
+ * @returns Array of cards to study in this cycle
  */
 export function buildCycleQueue(
   allCards: Card[],
@@ -31,7 +38,13 @@ export function buildCycleQueue(
 }
 
 /**
- * Initialize session state for a deck
+ * Initialize session state for a deck.
+ * 
+ * Creates a new study session starting at cycle 1 with all cards
+ * in the original deck order.
+ * 
+ * @param deckCards - Array of cards from the deck
+ * @returns Initial session state
  */
 export function initSession(deckCards: Card[]): SessionState {
   return {
@@ -44,7 +57,15 @@ export function initSession(deckCards: Card[]): SessionState {
 }
 
 /**
- * Apply an answer and return new state
+ * Apply an answer to a card and return updated session state.
+ * 
+ * Updates the incorrect cards set and tracks Cycle 1 answers for scoring.
+ * Advances to the next card index.
+ * 
+ * @param state - Current session state
+ * @param cardId - ID of the card that was answered
+ * @param wasCorrect - Whether the answer was correct
+ * @returns New session state with updated answer tracking
  */
 export function applyAnswer(
   state: SessionState,
@@ -56,10 +77,11 @@ export function applyAnswer(
   if (!wasCorrect) {
     newIncorrectIds.add(cardId);
   } else {
+    // Remove from incorrect set if it was previously incorrect
     newIncorrectIds.delete(cardId);
   }
   
-  // Track Cycle 1 answers for scoring
+  // Track Cycle 1 answers for scoring (only cycle 1 counts toward final score)
   const newCycle1Answers = new Map(state.cycle1Answers);
   if (state.cycle === 1) {
     newCycle1Answers.set(cardId, wasCorrect);
@@ -76,7 +98,20 @@ export function applyAnswer(
 }
 
 /**
- * Check if we should advance to next cycle or end session
+ * Determine if the session should advance to the next cycle or end.
+ * 
+ * Session ends if:
+ * - All cards are correct (no incorrect cards remaining), OR
+ * - Maximum cycles (4) have been reached
+ * 
+ * Session advances to next cycle if:
+ * - Current cycle is complete (last card answered), AND
+ * - There are incorrect cards remaining, AND
+ * - Current cycle is less than 4
+ * 
+ * @param state - Current session state
+ * @param allCards - All cards from the deck (used for validation)
+ * @returns Object indicating whether to advance cycle or end session
  */
 export function shouldAdvanceCycle(state: SessionState, allCards: Card[]): {
   shouldAdvance: boolean;
@@ -88,23 +123,30 @@ export function shouldAdvanceCycle(state: SessionState, allCards: Card[]): {
     return { shouldAdvance: false, shouldEnd: false };
   }
   
-  // Last card of cycle
+  // Last card of cycle - check if we should end or continue
   if (state.incorrectCardIds.size === 0) {
-    // No incorrect cards, end session
+    // All cards correct - end session early
     return { shouldAdvance: false, shouldEnd: true };
   }
   
   if (state.cycle >= 4) {
-    // Max cycles reached, end session
+    // Maximum cycles reached - end session
     return { shouldAdvance: false, shouldEnd: true };
   }
   
-  // Advance to next cycle
+  // Advance to next cycle with remaining incorrect cards
   return { shouldAdvance: true, shouldEnd: false };
 }
 
 /**
- * Start next cycle with incorrect cards
+ * Start the next cycle with only the cards that were incorrect.
+ * 
+ * Resets the card index to 0 and builds a new queue containing
+ * only the cards that need more practice.
+ * 
+ * @param state - Current session state
+ * @param allCards - All cards from the deck in original order
+ * @returns Updated session state for the new cycle
  */
 export function startNextCycle(state: SessionState, allCards: Card[]): SessionState {
   const nextCycle = state.cycle + 1;
@@ -119,7 +161,14 @@ export function startNextCycle(state: SessionState, allCards: Card[]): SessionSt
 }
 
 /**
- * Calculate Cycle 1 score
+ * Calculate the Cycle 1 score for display on results screen.
+ * 
+ * Only Cycle 1 answers count toward the final score. This provides
+ * a consistent baseline metric regardless of how many retry cycles
+ * were needed.
+ * 
+ * @param state - Session state containing Cycle 1 answers
+ * @returns Object with correct count, total count, and percentage
  */
 export function calculateCycle1Score(state: SessionState): {
   correct: number;

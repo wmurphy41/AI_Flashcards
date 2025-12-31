@@ -2,6 +2,10 @@
   max-width: 600px;
   margin: 0 auto;
   padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
   min-height: 100vh;
 }
 
@@ -17,9 +21,11 @@
 
 .back-button {
   position: absolute;
-  left: 1rem;
-  top: 1rem;
-  padding: 0.5rem 1rem;
+  left: max(1rem, env(safe-area-inset-left));
+  top: max(1rem, env(safe-area-inset-top));
+  padding: 0.75rem 1.25rem;
+  min-height: 44px;
+  min-width: 44px;
   font-size: 1rem;
   background-color: #646cff;
   color: white;
@@ -27,6 +33,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s;
+  touch-action: manipulation;
 }
 
 .back-button:hover {
@@ -37,14 +44,38 @@
   width: 100%;
 }
 
-.loading,
-.error {
+.loading {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error-container {
   text-align: center;
   padding: 2rem;
 }
 
 .error {
   color: #ff6b6b;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-detail {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-deck-message {
+  text-align: center;
+  padding: 1.5rem;
+  color: #888;
+  margin-top: 2rem;
 }
 
 .deck-list {
@@ -149,7 +180,8 @@
 
 .study-button {
   width: 100%;
-  padding: 1rem;
+  padding: 1rem 1.5rem;
+  min-height: 48px;
   font-size: 1.1rem;
   background-color: #646cff;
   color: white;
@@ -158,6 +190,7 @@
   cursor: pointer;
   margin-top: 2rem;
   transition: background-color 0.2s;
+  touch-action: manipulation;
 }
 
 .study-button:hover {
@@ -176,6 +209,9 @@
 
 .study-header {
   padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
   background-color: #1a1a1a;
   border-bottom: 1px solid #333;
   position: relative;
@@ -214,6 +250,7 @@
 
 .study-content {
   padding: 2rem 1rem;
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -263,6 +300,12 @@
 .cycles-completed {
   font-size: 0.9rem;
   color: #888;
+  margin: 1rem 0;
+}
+
+.remaining-incorrect {
+  font-size: 0.9rem;
+  color: #ffa500;
   margin: 1rem 0;
 }
 
