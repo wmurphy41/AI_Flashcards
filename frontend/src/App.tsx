@@ -72,6 +72,13 @@ function App() {
     }
   }
 
+  const handleFinish = () => {
+    setView('list')
+    setSessionState(null)
+    setSelectedDeckId(null)
+    setSelectedDeck(null)
+  }
+
   const handleStartStudy = () => {
     if (selectedDeck) {
       // Handle edge case: deck with no cards
@@ -221,9 +228,14 @@ function App() {
                 {remainingIncorrect} card{remainingIncorrect !== 1 ? 's' : ''} still need practice
               </p>
             )}
-            <button className="study-button" onClick={handleBack}>
-              Back to Deck
-            </button>
+            <div className="results-actions">
+              <button className="study-button" onClick={handleBack}>
+                Replay Session
+              </button>
+              <button className="study-button" onClick={handleFinish}>
+                Finished
+              </button>
+            </div>
           </div>
         </div>
       </div>

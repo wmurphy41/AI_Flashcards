@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Card } from '../api';
 import './CardView.css';
 
@@ -15,6 +15,11 @@ export function CardView({ card, onSwipe, onTap }: CardViewProps) {
   const [dragOffset, setDragOffset] = useState(0);
   const startPos = useRef<{ x: number; y: number } | null>(null);
   const isDragging = useRef(false);
+
+  // Reset flip state when card changes (new card always starts on front)
+  useEffect(() => {
+    setIsFlipped(false);
+  }, [card.id]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return; // Only left mouse button
@@ -56,12 +61,18 @@ export function CardView({ card, onSwipe, onTap }: CardViewProps) {
     
     // Check if it's a swipe
     if (absDeltaX > SWIPE_THRESHOLD && absDeltaX > absDeltaY) {
-      if (deltaX > 0) {
-        onSwipe('right');
+      // Only allow swipe when on back side (flipped)
+      if (isFlipped) {
+        if (deltaX > 0) {
+          onSwipe('right');
+        } else {
+          onSwipe('left');
+        }
+        setDragOffset(0);
       } else {
-        onSwipe('left');
+        // If not flipped, ignore swipe and reset drag offset
+        setDragOffset(0);
       }
-      setDragOffset(0);
     } else if (!isDragging.current) {
       // It was a tap, not a drag
       setIsFlipped(!isFlipped);
@@ -102,10 +113,12 @@ export function CardView({ card, onSwipe, onTap }: CardViewProps) {
           <p>{card.back}</p>
         </div>
       </div>
-      <div className="swipe-hint">
-        <span className="swipe-left">← Incorrect</span>
-        <span className="swipe-right">Correct →</span>
-      </div>
+      {isFlipped && (
+        <div className="swipe-hint">
+          <span className="swipe-left">← Incorrect</span>
+          <span className="swipe-right">Correct →</span>
+        </div>
+      )}
     </div>
   );
 }

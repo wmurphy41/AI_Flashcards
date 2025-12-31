@@ -309,6 +309,24 @@
   margin: 1rem 0;
 }
 
+.results-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+@media (min-width: 481px) {
+  .results-actions {
+    flex-direction: row;
+  }
+  
+  .results-actions .study-button {
+    flex: 1;
+  }
+}
+
 /* Mobile-first responsive */
 @media (max-width: 480px) {
   .app-container {
