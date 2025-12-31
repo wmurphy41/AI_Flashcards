@@ -1,42 +1,231 @@
-#root {
-  max-width: 1280px;
+.app-container {
+  max-width: 600px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 2rem;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.header h1 {
+  font-size: 2rem;
+  margin: 0.5rem 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.back-button {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.back-button:hover {
+  background-color: #535bf2;
 }
 
-.card {
-  padding: 2em;
+.content {
+  width: 100%;
 }
 
-.read-the-docs {
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+.deck-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.deck-item {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.deck-item:hover {
+  border-color: #646cff;
+  background-color: #242424;
+  transform: translateY(-2px);
+}
+
+.deck-item:active {
+  transform: translateY(0);
+}
+
+.deck-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+.deck-description {
+  margin: 0.5rem 0;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.deck-count {
+  margin: 0.5rem 0 0 0;
   color: #888;
+  font-size: 0.85rem;
+}
+
+.deck-detail {
+  width: 100%;
+}
+
+.deck-detail h2 {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem 0;
+  color: #fff;
+}
+
+.description {
+  color: #aaa;
+  margin: 0.5rem 0 1rem 0;
+  font-size: 1rem;
+}
+
+.card-count {
+  color: #888;
+  margin: 0 0 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+.preview-section {
+  margin: 2rem 0;
+}
+
+.preview-section h3 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem 0;
+  color: #fff;
+}
+
+.card-preview-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card-preview-item {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.card-preview-item.muted {
+  color: #888;
+  font-style: italic;
+}
+
+.study-button {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: not-allowed;
+  opacity: 0.6;
+  margin-top: 2rem;
+}
+
+.coming-soon {
+  text-align: center;
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Mobile-first responsive */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.5rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .deck-item {
+    padding: 1rem;
+    min-height: 70px;
+  }
+
+  .deck-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .deck-item {
+    background-color: #f9f9f9;
+    border-color: #ddd;
+    color: #213547;
+  }
+
+  .deck-item:hover {
+    background-color: #f0f0f0;
+    border-color: #646cff;
+  }
+
+  .deck-title {
+    color: #213547;
+  }
+
+  .deck-description {
+    color: #666;
+  }
+
+  .deck-count {
+    color: #888;
+  }
+
+  .deck-detail h2 {
+    color: #213547;
+  }
+
+  .description {
+    color: #666;
+  }
+
+  .preview-section h3 {
+    color: #213547;
+  }
+
+  .card-preview-item {
+    background-color: #f9f9f9;
+    border-color: #ddd;
+    color: #213547;
+  }
 }
