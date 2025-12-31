@@ -1,0 +1,23 @@
+services:
+  backend:
+    image: ghcr.io/wmurphy41/ai_flashcards-backend:v1.0.0
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/wmurphy41/ai_flashcards-frontend:v1.0.0
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
