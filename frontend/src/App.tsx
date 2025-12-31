@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getDecks, getDeck } from './api'
-import { DeckSummary, Deck } from './types'
+import { getDecks, getDeck, type DeckSummary, type Deck } from './api'
 import './App.css'
 
 type View = 'list' | 'detail'

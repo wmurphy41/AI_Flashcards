@@ -1,4 +1,23 @@
-import { DeckSummary, Deck } from './types';
+// Define types inline to avoid module resolution issues
+type Card = {
+  id: string;
+  front: string;
+  back: string;
+};
+
+type DeckSummary = {
+  id: string;
+  title: string;
+  description?: string;
+  card_count: number;
+};
+
+type Deck = {
+  id: string;
+  title: string;
+  description?: string;
+  cards: Card[];
+};
 
 export async function getDecks(): Promise<DeckSummary[]> {
   const response = await fetch('/api/decks');
@@ -19,3 +38,5 @@ export async function getDeck(id: string): Promise<Deck> {
   return response.json();
 }
 
+// Export types for use in other files
+export type { Card, DeckSummary, Deck };
