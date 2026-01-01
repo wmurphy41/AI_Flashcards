@@ -144,6 +144,55 @@ Returns full deck details including all cards:
 
 Returns 404 with `{"detail":"Deck not found"}` if deck doesn't exist.
 
+## AI Deck Generation
+
+The `ai_deckgen` package provides tools for generating flashcard decks using AI.
+
+### Setup
+
+1. Install dependencies (if not already installed):
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+
+2. Set your OpenAI API key:
+   ```bash
+   export OPENAI_API_KEY=your_api_key_here
+   ```
+   
+   Alternatively, you can create a `.env` file in the project root (this file is git-ignored):
+   ```
+   OPENAI_API_KEY=your_api_key_here
+   ```
+
+### CLI Usage
+
+Run commands from the repository root:
+
+```bash
+# List available decks
+python -m backend.ai_deckgen.cli list
+
+# Preview a deck
+python -m backend.ai_deckgen.cli preview <deck_id>
+python -m backend.ai_deckgen.cli preview spanish-basics
+
+# Validate a deck file
+python -m backend.ai_deckgen.cli validate path/to/deck.json
+
+# Generate a new deck (coming soon)
+python -m backend.ai_deckgen.cli generate "Spanish vocabulary for restaurants"
+```
+
+### Package Structure
+
+- `backend/ai_deckgen/cli.py` - CLI interface
+- `backend/ai_deckgen/generator.py` - AI deck generation logic
+- `backend/ai_deckgen/validator.py` - Deck validation
+- `backend/ai_deckgen/storage.py` - File I/O operations
+- `backend/ai_deckgen/prompts/` - Prompt templates
+
 ## Flashcard Decks
 
 ### Deck JSON Schema
