@@ -1,5 +1,6 @@
 import type { Card, Deck } from '../api';
 import type { SessionState } from '../session';
+import { classifyCardOutcome, type CardOutcome } from '../sessionStats';
 import './DetailedResults.css';
 
 type DetailedResultsProps = {
@@ -9,31 +10,17 @@ type DetailedResultsProps = {
   onBack: () => void;
 };
 
-type CardStatus = 'correct-1st' | 'correct-retry' | 'missed' | 'unattempted';
-
-function classifyCardStatus(
-  card: Card,
-  sessionState: SessionState
-): CardStatus {
-  const cycle1Result = sessionState.cycle1Answers.get(card.uid);
-  
-  if (cycle1Result === undefined) {
-    // Not in cycle1Answers means never attempted
-    return 'unattempted';
-  }
-  
-  if (cycle1Result === true) {
-    // Correct on cycle 1 - Green (even if later incorrect)
-    return 'correct-1st';
-  }
-  
-  // Was incorrect on cycle 1 - check if eventually got correct
-  if (sessionState.incorrectCardIds.has(card.uid)) {
-    // Still in incorrect set - never got correct
-    return 'missed';
-  } else {
-    // Not in incorrect set but was wrong on cycle 1 - got correct later
-    return 'correct-retry';
+// Map sessionStats outcome to CSS class status
+function outcomeToStatus(outcome: CardOutcome): 'correct-1st' | 'correct-retry' | 'missed' | 'unattempted' {
+  switch (outcome) {
+    case 'correct-first-time':
+      return 'correct-1st';
+    case 'correct-on-retry':
+      return 'correct-retry';
+    case 'missed':
+      return 'missed';
+    case 'unattempted':
+      return 'unattempted';
   }
 }
 
@@ -43,10 +30,14 @@ export function DetailedResults({
   startSide,
   onBack,
 }: DetailedResultsProps) {
-  const cardStatuses = deck.cards.map((card) => ({
-    card,
-    status: classifyCardStatus(card, sessionState),
-  }));
+  const cardStatuses = deck.cards.map((card) => {
+    const outcome = classifyCardOutcome(card, sessionState);
+    return {
+      card,
+      outcome,
+      status: outcomeToStatus(outcome),
+    };
+  });
 
   return (
     <div className="app-container">
@@ -82,9 +73,9 @@ export function DetailedResults({
           <div className="cards-list">
             {cardStatuses.map(({ card, status }) => {
               const promptText = startSide === 'front' ? card.front : card.back;
-              const statusLabels: Record<CardStatus, string> = {
-                'correct-1st': 'Correct 1st',
-                'correct-retry': 'Correct retry',
+              const statusLabels: Record<'correct-1st' | 'correct-retry' | 'missed' | 'unattempted', string> = {
+                'correct-1st': 'Correct First Time',
+                'correct-retry': 'Correct On Retry',
                 'missed': 'Missed',
                 'unattempted': 'Unattempted',
               };

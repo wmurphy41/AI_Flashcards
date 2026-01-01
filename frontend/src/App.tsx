@@ -3,14 +3,15 @@ import { getDecks, getDeck, type DeckSummary, type Deck } from './api'
 import { CardView } from './components/CardView'
 import { SessionSetup } from './components/SessionSetup'
 import { DetailedResults } from './components/DetailedResults'
+import { ConfirmDialog } from './components/ConfirmDialog'
 import {
   initSession,
   applyAnswer,
   shouldAdvanceCycle,
   startNextCycle,
-  calculateCycle1Score,
   type SessionState,
 } from './session'
+import { computeScores, computeBreakdown } from './sessionStats'
 import './App.css'
 
 type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results'
@@ -24,6 +25,7 @@ function App() {
   const [sessionOptions, setSessionOptions] = useState<{ startSide: 'front' | 'back'; maxCycles: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showEndSessionConfirm, setShowEndSessionConfirm] = useState(false)
 
   // Load deck list on mount
   useEffect(() => {
@@ -141,6 +143,22 @@ function App() {
     // Card flip is handled by CardView component
   }
 
+  const handleEndSessionClick = () => {
+    setShowEndSessionConfirm(true)
+  }
+
+  const handleEndSessionConfirm = () => {
+    setShowEndSessionConfirm(false)
+    if (sessionState) {
+      // Navigate to results immediately, preserving all scoring
+      setView('results')
+    }
+  }
+
+  const handleEndSessionCancel = () => {
+    setShowEndSessionConfirm(false)
+  }
+
   if (view === 'study' && sessionState && selectedDeck) {
     // Handle edge case: no cards in current cycle queue
     if (sessionState.cycleQueue.length === 0) {
@@ -216,6 +234,20 @@ function App() {
             startSide={sessionOptions?.startSide || 'front'}
           />
         </div>
+        <div className="study-footer">
+          <button className="study-button end-session-button" onClick={handleEndSessionClick}>
+            End Session
+          </button>
+        </div>
+        {showEndSessionConfirm && (
+          <ConfirmDialog
+            title="End session?"
+            onConfirm={handleEndSessionConfirm}
+            onCancel={handleEndSessionCancel}
+            confirmLabel="End"
+            cancelLabel="Cancel"
+          />
+        )}
       </div>
     )
   }
@@ -241,9 +273,9 @@ function App() {
     )
   }
 
-  if (view === 'results' && sessionState) {
-    const score = calculateCycle1Score(sessionState)
-    const remainingIncorrect = sessionState.incorrectCardIds.size
+  if (view === 'results' && sessionState && selectedDeck) {
+    const scores = computeScores(sessionState)
+    const breakdown = computeBreakdown(selectedDeck.cards, sessionState)
 
     return (
       <div className="app-container">
@@ -256,25 +288,51 @@ function App() {
         <div className="content">
           <div className="results-container">
             <h2>Session Complete</h2>
+            
             <div className="score-section">
-              <div className="score-main">
-                <span className="score-percent">{score.percent}%</span>
-                <p className="score-label">Cycle 1 Score</p>
+              <div className="score-group">
+                <div className="score-main">
+                  <span className="score-percent">{scores.rightOnFirstTry.percent}%</span>
+                  <p className="score-label">Right on First Try</p>
+                </div>
+                <p className="score-detail">
+                  {scores.rightOnFirstTry.correct} / {scores.rightOnFirstTry.total}
+                </p>
               </div>
-              <p className="score-detail">
-                {score.correct} / {score.total} correct on Cycle 1
-              </p>
+              
+              <div className="score-group">
+                <div className="score-main">
+                  <span className="score-percent">{scores.overallScore.percent}%</span>
+                  <p className="score-label">Overall Score</p>
+                </div>
+                <p className="score-detail">
+                  {scores.overallScore.correct} / {scores.overallScore.total}
+                </p>
+              </div>
             </div>
-            {sessionState.cycle > 1 && (
-              <p className="cycles-completed">
-                Completed {sessionState.cycle} cycle{sessionState.cycle !== 1 ? 's' : ''}
-              </p>
-            )}
-            {remainingIncorrect > 0 && (
-              <p className="remaining-incorrect">
-                {remainingIncorrect} card{remainingIncorrect !== 1 ? 's' : ''} still need practice
-              </p>
-            )}
+
+            <div className="breakdown-section">
+              <h3>Breakdown</h3>
+              <div className="breakdown-list">
+                <div className="breakdown-item">
+                  <span className="breakdown-label">Correct First Time:</span>
+                  <span className="breakdown-value">{breakdown.correctFirstTime}</span>
+                </div>
+                <div className="breakdown-item">
+                  <span className="breakdown-label">Correct On Retry:</span>
+                  <span className="breakdown-value">{breakdown.correctOnRetry}</span>
+                </div>
+                <div className="breakdown-item">
+                  <span className="breakdown-label">Missed:</span>
+                  <span className="breakdown-value">{breakdown.missed}</span>
+                </div>
+                <div className="breakdown-item">
+                  <span className="breakdown-label">Unattempted:</span>
+                  <span className="breakdown-value">{breakdown.unattempted}</span>
+                </div>
+              </div>
+            </div>
+
             <div className="results-actions">
               <button className="study-button" onClick={handleShowDetailedResults}>
                 Show Detailed Results

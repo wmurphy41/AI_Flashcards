@@ -250,11 +250,27 @@
 
 .study-content {
   padding: 2rem 1rem;
-  padding-bottom: max(2rem, env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 120px);
+  flex: 1;
+}
+
+.study-footer {
+  padding: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  border-top: 1px solid #333;
+  background-color: #1a1a1a;
+}
+
+.end-session-button {
+  width: 100%;
+  background-color: #f44336;
+  color: white;
+}
+
+.end-session-button:hover {
+  background-color: #d32f2f;
 }
 
 /* Results Styles */
@@ -271,10 +287,19 @@
 
 .score-section {
   margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.score-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .score-main {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .score-percent {
@@ -309,6 +334,43 @@
   margin: 1rem 0;
 }
 
+.breakdown-section {
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.breakdown-section h3 {
+  font-size: 1.2rem;
+  margin: 0 0 1rem 0;
+  color: #fff;
+  text-align: center;
+}
+
+.breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.breakdown-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.breakdown-value {
+  font-weight: 600;
+  color: #646cff;
+}
+
 .results-actions {
   display: flex;
   flex-direction: column;
@@ -318,6 +380,20 @@
 }
 
 @media (min-width: 481px) {
+  .score-section {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .score-group {
+    flex: 1;
+  }
+
+  .breakdown-list {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
   .results-actions {
     flex-direction: row;
   }
@@ -404,5 +480,22 @@
 
   .score-percent {
     color: #646cff;
+  }
+
+  .breakdown-section h3 {
+    color: #213547;
+  }
+
+  .breakdown-label {
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .breakdown-list {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .study-footer {
+    border-top-color: #ddd;
+    background-color: #f9f9f9;
   }
 }
