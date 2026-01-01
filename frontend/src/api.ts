@@ -1,6 +1,7 @@
 // Define types inline to avoid module resolution issues
 type Card = {
   id: string;
+  uid: string;
   front: string;
   back: string;
 };

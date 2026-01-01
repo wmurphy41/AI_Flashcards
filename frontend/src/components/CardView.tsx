@@ -6,20 +6,21 @@ type CardViewProps = {
   card: Card;
   onSwipe: (direction: 'left' | 'right') => void;
   onTap: () => void;
+  startSide?: 'front' | 'back';
 };
 
 const SWIPE_THRESHOLD = 80;
 
-export function CardView({ card, onSwipe, onTap }: CardViewProps) {
-  const [isFlipped, setIsFlipped] = useState(false);
+export function CardView({ card, onSwipe, onTap, startSide = 'front' }: CardViewProps) {
+  const [isFlipped, setIsFlipped] = useState(startSide === 'back');
   const [dragOffset, setDragOffset] = useState(0);
   const startPos = useRef<{ x: number; y: number } | null>(null);
   const isDragging = useRef(false);
 
-  // Reset flip state when card changes (new card always starts on front)
+  // Reset flip state when card changes (use startSide to determine initial state)
   useEffect(() => {
-    setIsFlipped(false);
-  }, [card.id]);
+    setIsFlipped(startSide === 'back');
+  }, [card.uid, startSide]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return; // Only left mouse button

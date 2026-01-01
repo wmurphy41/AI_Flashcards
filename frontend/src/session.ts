@@ -5,7 +5,8 @@ export type SessionState = {
   currentCardIndex: number;
   cycleQueue: Card[];
   incorrectCardIds: Set<string>;
-  cycle1Answers: Map<string, boolean>; // cardId -> wasCorrect
+  cycle1Answers: Map<string, boolean>; // cardUid -> wasCorrect
+  maxCycles: number;
 };
 
 export type SessionAction = 
@@ -16,12 +17,12 @@ export type SessionAction =
  * Build the queue of cards for a cycle.
  * 
  * Cycle 1: Returns all cards in their original order from the deck.
- * Cycles 2-4: Returns only cards that were marked incorrect, maintaining
- *              the same relative order as they appeared in the original deck.
+ * Cycles 2+: Returns only cards that were marked incorrect, maintaining
+ *            the same relative order as they appeared in the original deck.
  * 
  * @param allCards - All cards from the deck in original order
- * @param incorrectCardIds - Set of card IDs that were answered incorrectly
- * @param cycle - Current cycle number (1-4)
+ * @param incorrectCardIds - Set of card UIDs that were answered incorrectly
+ * @param cycle - Current cycle number
  * @returns Array of cards to study in this cycle
  */
 export function buildCycleQueue(
@@ -33,8 +34,8 @@ export function buildCycleQueue(
     return [...allCards];
   }
   
-  // For cycles 2-4, return only incorrect cards in original order
-  return allCards.filter(card => incorrectCardIds.has(card.id));
+  // For cycles 2+, return only incorrect cards in original order
+  return allCards.filter(card => incorrectCardIds.has(card.uid));
 }
 
 /**
@@ -44,15 +45,17 @@ export function buildCycleQueue(
  * in the original deck order.
  * 
  * @param deckCards - Array of cards from the deck
+ * @param maxCycles - Maximum number of cycles (default: 4)
  * @returns Initial session state
  */
-export function initSession(deckCards: Card[]): SessionState {
+export function initSession(deckCards: Card[], maxCycles: number = 4): SessionState {
   return {
     cycle: 1,
     currentCardIndex: 0,
     cycleQueue: buildCycleQueue(deckCards, new Set(), 1),
     incorrectCardIds: new Set(),
     cycle1Answers: new Map(),
+    maxCycles,
   };
 }
 
@@ -63,28 +66,28 @@ export function initSession(deckCards: Card[]): SessionState {
  * Advances to the next card index.
  * 
  * @param state - Current session state
- * @param cardId - ID of the card that was answered
+ * @param cardUid - UID of the card that was answered
  * @param wasCorrect - Whether the answer was correct
  * @returns New session state with updated answer tracking
  */
 export function applyAnswer(
   state: SessionState,
-  cardId: string,
+  cardUid: string,
   wasCorrect: boolean
 ): SessionState {
   const newIncorrectIds = new Set(state.incorrectCardIds);
   
   if (!wasCorrect) {
-    newIncorrectIds.add(cardId);
+    newIncorrectIds.add(cardUid);
   } else {
     // Remove from incorrect set if it was previously incorrect
-    newIncorrectIds.delete(cardId);
+    newIncorrectIds.delete(cardUid);
   }
   
   // Track Cycle 1 answers for scoring (only cycle 1 counts toward final score)
   const newCycle1Answers = new Map(state.cycle1Answers);
   if (state.cycle === 1) {
-    newCycle1Answers.set(cardId, wasCorrect);
+    newCycle1Answers.set(cardUid, wasCorrect);
   }
   
   const nextIndex = state.currentCardIndex + 1;
@@ -102,12 +105,12 @@ export function applyAnswer(
  * 
  * Session ends if:
  * - All cards are correct (no incorrect cards remaining), OR
- * - Maximum cycles (4) have been reached
+ * - Maximum cycles have been reached
  * 
  * Session advances to next cycle if:
  * - Current cycle is complete (last card answered), AND
  * - There are incorrect cards remaining, AND
- * - Current cycle is less than 4
+ * - Current cycle is less than maxCycles
  * 
  * @param state - Current session state
  * @param _allCards - All cards from the deck (currently unused, reserved for future validation)
@@ -129,7 +132,7 @@ export function shouldAdvanceCycle(state: SessionState, _allCards: Card[]): {
     return { shouldAdvance: false, shouldEnd: true };
   }
   
-  if (state.cycle >= 4) {
+  if (state.cycle >= state.maxCycles) {
     // Maximum cycles reached - end session
     return { shouldAdvance: false, shouldEnd: true };
   }

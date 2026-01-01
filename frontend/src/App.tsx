@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getDecks, getDeck, type DeckSummary, type Deck } from './api'
 import { CardView } from './components/CardView'
+import { SessionSetup } from './components/SessionSetup'
 import {
   initSession,
   applyAnswer,
@@ -11,7 +12,7 @@ import {
 } from './session'
 import './App.css'
 
-type View = 'list' | 'detail' | 'study' | 'results'
+type View = 'list' | 'detail' | 'setup' | 'study' | 'results'
 
 function App() {
   const [view, setView] = useState<View>('list')
@@ -19,6 +20,7 @@ function App() {
   const [decks, setDecks] = useState<DeckSummary[]>([])
   const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null)
   const [sessionState, setSessionState] = useState<SessionState | null>(null)
+  const [sessionOptions, setSessionOptions] = useState<{ startSide: 'front' | 'back'; maxCycles: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -66,9 +68,13 @@ function App() {
       setView('list')
       setSelectedDeckId(null)
       setSelectedDeck(null)
+    } else if (view === 'setup') {
+      setView('detail')
+      setSessionOptions(null)
     } else if (view === 'study' || view === 'results') {
       setView('detail')
       setSessionState(null)
+      setSessionOptions(null)
     }
   }
 
@@ -86,10 +92,22 @@ function App() {
         setError('This deck has no cards to study.')
         return
       }
-      const session = initSession(selectedDeck.cards)
+      setView('setup')
+    }
+  }
+
+  const handleSetupStart = (options: { startSide: 'front' | 'back'; maxCycles: number }) => {
+    if (selectedDeck) {
+      setSessionOptions(options)
+      const session = initSession(selectedDeck.cards, options.maxCycles)
       setSessionState(session)
       setView('study')
     }
+  }
+
+  const handleSetupCancel = () => {
+    setView('detail')
+    setSessionOptions(null)
   }
 
   const handleCardAnswer = (wasCorrect: boolean) => {
@@ -98,7 +116,7 @@ function App() {
     const currentCard = sessionState.cycleQueue[sessionState.currentCardIndex]
     if (!currentCard) return
 
-    const newState = applyAnswer(sessionState, currentCard.id, wasCorrect)
+    const newState = applyAnswer(sessionState, currentCard.uid, wasCorrect)
     const { shouldAdvance, shouldEnd } = shouldAdvanceCycle(newState, selectedDeck.cards)
 
     if (shouldEnd) {
@@ -175,10 +193,10 @@ function App() {
           <button className="back-button" onClick={handleBack}>
             ← Back
           </button>
-          <div className="study-title">
-            <h2>{selectedDeck.title || 'Study Session'}</h2>
-            <p className="cycle-indicator">Cycle {sessionState.cycle} of 4</p>
-          </div>
+            <div className="study-title">
+              <h2>{selectedDeck.title || 'Study Session'}</h2>
+              <p className="cycle-indicator">Cycle {sessionState.cycle} of {sessionState.maxCycles}</p>
+            </div>
           <div className="progress-indicator">
             {progress} / {total}
           </div>
@@ -188,9 +206,20 @@ function App() {
             card={currentCard}
             onSwipe={(direction) => handleCardAnswer(direction === 'right')}
             onTap={handleCardTap}
+            startSide={sessionOptions?.startSide || 'front'}
           />
         </div>
       </div>
+    )
+  }
+
+  if (view === 'setup' && selectedDeck) {
+    return (
+      <SessionSetup
+        deck={selectedDeck}
+        onStart={handleSetupStart}
+        onCancel={handleSetupCancel}
+      />
     )
   }
 
@@ -275,7 +304,7 @@ function App() {
                 <h3>Preview</h3>
                 <ul className="card-preview-list">
                   {selectedDeck.cards.slice(0, 5).map((card) => (
-                    <li key={card.id} className="card-preview-item">
+                    <li key={card.uid} className="card-preview-item">
                       {card.front}
                     </li>
                   ))}
