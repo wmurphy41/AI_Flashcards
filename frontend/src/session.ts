@@ -110,10 +110,10 @@ export function applyAnswer(
  * - Current cycle is less than 4
  * 
  * @param state - Current session state
- * @param allCards - All cards from the deck (used for validation)
+ * @param _allCards - All cards from the deck (currently unused, reserved for future validation)
  * @returns Object indicating whether to advance cycle or end session
  */
-export function shouldAdvanceCycle(state: SessionState, allCards: Card[]): {
+export function shouldAdvanceCycle(state: SessionState, _allCards: Card[]): {
   shouldAdvance: boolean;
   shouldEnd: boolean;
 } {
