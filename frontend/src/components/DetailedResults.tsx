@@ -1,4 +1,4 @@
-import type { Card, Deck } from '../api';
+import type { Deck } from '../api';
 import type { SessionState } from '../session';
 import { classifyCardOutcome, type CardOutcome } from '../sessionStats';
 import './DetailedResults.css';

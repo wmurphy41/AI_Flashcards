@@ -22,6 +22,11 @@ export function CardView({ card, onSwipe, onTap, startSide = 'front' }: CardView
     setIsFlipped(startSide === 'back');
   }, [card.uid, startSide]);
 
+  // Scoring side is the opposite of start side
+  // If startSide = 'front', scoringSide = 'back' (isFlipped = true)
+  // If startSide = 'back', scoringSide = 'front' (isFlipped = false)
+  const isScoringSide = (startSide === 'front' && isFlipped) || (startSide === 'back' && !isFlipped);
+
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === 'mouse' && e.button !== 0) return; // Only left mouse button
     
@@ -62,8 +67,8 @@ export function CardView({ card, onSwipe, onTap, startSide = 'front' }: CardView
     
     // Check if it's a swipe
     if (absDeltaX > SWIPE_THRESHOLD && absDeltaX > absDeltaY) {
-      // Only allow swipe when on back side (flipped)
-      if (isFlipped) {
+      // Only allow swipe when on the scoring side (opposite of start side)
+      if (isScoringSide) {
         if (deltaX > 0) {
           onSwipe('right');
         } else {
@@ -71,7 +76,7 @@ export function CardView({ card, onSwipe, onTap, startSide = 'front' }: CardView
         }
         setDragOffset(0);
       } else {
-        // If not flipped, ignore swipe and reset drag offset
+        // If not on scoring side, ignore swipe and reset drag offset
         setDragOffset(0);
       }
     } else if (!isDragging.current) {
@@ -114,7 +119,7 @@ export function CardView({ card, onSwipe, onTap, startSide = 'front' }: CardView
           <p>{card.back}</p>
         </div>
       </div>
-      {isFlipped && (
+      {isScoringSide && (
         <div className="swipe-hint">
           <span className="swipe-left">← Incorrect</span>
           <span className="swipe-right">Correct →</span>
