@@ -1,9 +1,8 @@
 .card-view-container {
   width: 100%;
-  max-width: 480px;
+  max-width: 375px;
   margin: auto;
-  margin-left: clamp(12px, 4vw, 20px);
-  margin-right: clamp(12px, 4vw, 20px);
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -16,6 +15,13 @@
 }
 
 .card-content {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  perspective: 1000px;
+}
+
+.card-content.flipped {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
@@ -80,9 +86,16 @@
   margin-top: 0;
 }
 
-.swipe-left,
+.swipe-left {
+  opacity: 0.6;
+  text-align: left;
+  flex: 0 0 auto;
+}
+
 .swipe-right {
   opacity: 0.6;
+  text-align: right;
+  flex: 0 0 auto;
 }
 
 @media (max-width: 480px) {

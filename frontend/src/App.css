@@ -241,6 +241,11 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   min-width: 0;
+  width: 100%;
+}
+
+.study-title h2 {
+  text-align: center;
 }
 
 .study-title h2 {
@@ -253,6 +258,7 @@
   font-size: 0.9rem;
   color: #888;
   margin: 0.25rem 0 0 0;
+  text-align: center;
 }
 
 .progress-indicator {
@@ -280,7 +286,7 @@
   padding: 0.5rem 1rem;
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   border-top: 1px solid #333;
-  background-color: #1a1a1a;
+  background-color: transparent;
   display: flex;
   align-items: center;
   max-width: 450px;
@@ -523,6 +529,6 @@
 
   .study-footer {
     border-top-color: #ddd;
-    background-color: #f9f9f9;
+    background-color: transparent;
   }
 }
