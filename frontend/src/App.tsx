@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getDecks, getDeck, type DeckSummary, type Deck } from './api'
 import { CardView } from './components/CardView'
 import { SessionSetup } from './components/SessionSetup'
+import { DetailedResults } from './components/DetailedResults'
 import {
   initSession,
   applyAnswer,
@@ -12,7 +13,7 @@ import {
 } from './session'
 import './App.css'
 
-type View = 'list' | 'detail' | 'setup' | 'study' | 'results'
+type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results'
 
 function App() {
   const [view, setView] = useState<View>('list')
@@ -71,11 +72,17 @@ function App() {
     } else if (view === 'setup') {
       setView('detail')
       setSessionOptions(null)
+    } else if (view === 'detailed-results') {
+      setView('results')
     } else if (view === 'study' || view === 'results') {
       setView('detail')
       setSessionState(null)
       setSessionOptions(null)
     }
+  }
+
+  const handleShowDetailedResults = () => {
+    setView('detailed-results')
   }
 
   const handleFinish = () => {
@@ -223,6 +230,17 @@ function App() {
     )
   }
 
+  if (view === 'detailed-results' && sessionState && selectedDeck && sessionOptions) {
+    return (
+      <DetailedResults
+        deck={selectedDeck}
+        sessionState={sessionState}
+        startSide={sessionOptions.startSide}
+        onBack={handleBack}
+      />
+    )
+  }
+
   if (view === 'results' && sessionState) {
     const score = calculateCycle1Score(sessionState)
     const remainingIncorrect = sessionState.incorrectCardIds.size
@@ -258,6 +276,9 @@ function App() {
               </p>
             )}
             <div className="results-actions">
+              <button className="study-button" onClick={handleShowDetailedResults}>
+                Show Detailed Results
+              </button>
               <button className="study-button" onClick={handleBack}>
                 Replay Session
               </button>

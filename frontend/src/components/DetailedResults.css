@@ -1,0 +1,146 @@
+.detailed-results-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.detailed-results-container h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.legend-color {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.legend-color.status-correct-1st {
+  background-color: #4caf50;
+}
+
+.legend-color.status-correct-retry {
+  background-color: #ffc107;
+}
+
+.legend-color.status-missed {
+  background-color: #f44336;
+}
+
+.legend-color.status-unattempted {
+  background-color: #9e9e9e;
+}
+
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card-result-item {
+  padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.card-result-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-result-text {
+  margin: 0;
+  flex: 1;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.card-result-status {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Status colors */
+.card-result-item.status-correct-1st {
+  background-color: rgba(76, 175, 80, 0.15);
+  border-color: rgba(76, 175, 80, 0.4);
+}
+
+.card-result-item.status-correct-retry {
+  background-color: rgba(255, 193, 7, 0.15);
+  border-color: rgba(255, 193, 7, 0.4);
+}
+
+.card-result-item.status-missed {
+  background-color: rgba(244, 67, 54, 0.15);
+  border-color: rgba(244, 67, 54, 0.4);
+}
+
+.card-result-item.status-unattempted {
+  background-color: rgba(158, 158, 158, 0.15);
+  border-color: rgba(158, 158, 158, 0.4);
+}
+
+@media (prefers-color-scheme: light) {
+  .legend {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .legend-color {
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .card-result-status {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .card-result-item.status-correct-1st {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-color: rgba(76, 175, 80, 0.3);
+  }
+
+  .card-result-item.status-correct-retry {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.3);
+  }
+
+  .card-result-item.status-missed {
+    background-color: rgba(244, 67, 54, 0.1);
+    border-color: rgba(244, 67, 54, 0.3);
+  }
+
+  .card-result-item.status-unattempted {
+    background-color: rgba(158, 158, 158, 0.1);
+    border-color: rgba(158, 158, 158, 0.3);
+  }
+}
+
