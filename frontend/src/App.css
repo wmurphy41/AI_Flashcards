@@ -245,13 +245,11 @@
 }
 
 .study-title h2 {
-  text-align: center;
-}
-
-.study-title h2 {
   font-size: clamp(1rem, 4vw, 1.25rem);
   margin: 0;
   color: #fff;
+  text-align: center;
+  width: 100%;
 }
 
 .cycle-indicator {
@@ -259,6 +257,7 @@
   color: #888;
   margin: 0.25rem 0 0 0;
   text-align: center;
+  width: 100%;
 }
 
 .progress-indicator {
