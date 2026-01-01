@@ -6,6 +6,7 @@ class Card(BaseModel):
     id: str = Field(..., description="Unique card ID within the deck")
     front: str = Field(..., description="Front side of the card")
     back: str = Field(..., description="Back side of the card")
+    uid: Optional[str] = Field(None, description="Globally unique card identifier (deckId:cardId)")
 
 
 class Deck(BaseModel):

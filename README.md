@@ -130,11 +130,17 @@ Returns full deck details including all cards:
   "title": "Spanish Basics",
   "description": "Common greetings and phrases",
   "cards": [
-    { "id": "c1", "front": "hola", "back": "hello" },
-    { "id": "c2", "front": "adiós", "back": "goodbye" }
+    { "id": "c1", "uid": "spanish-basics:c1", "front": "hola", "back": "hello" },
+    { "id": "c2", "uid": "spanish-basics:c2", "front": "adiós", "back": "goodbye" }
   ]
 }
 ```
+
+**Notes:**
+- All deck IDs in responses are normalized to kebab-case (lowercase, letters/numbers/hyphens only)
+- Each card includes a `uid` field: a globally unique identifier in the format `<deckId>:<cardId>`
+- The `uid` is computed by the backend and not stored in JSON files
+- Requesting a deck with a non-normalized ID (e.g., `Spanish_Basics`) will still resolve correctly
 
 Returns 404 with `{"detail":"Deck not found"}` if deck doesn't exist.
 
@@ -145,13 +151,19 @@ Returns 404 with `{"detail":"Deck not found"}` if deck doesn't exist.
 Deck JSON files are located in `backend/app/content/decks/`. Each deck file must:
 
 - Have a `.json` extension
-- Have `deck.id` matching the filename stem (e.g., `spanish-basics.json` → `id: "spanish-basics"`)
 - Have unique `card.id` values within each deck
 - Follow this schema:
 
+**Deck ID Normalization:**
+- Deck IDs are automatically normalized to kebab-case (lowercase, letters/numbers/hyphens only) from the filename stem
+- The `id` field in JSON files will be overridden with the normalized filename stem
+- Example: `Spanish_Basics.json` → normalized ID: `spanish-basics`
+- Example: `french-numbers.json` → normalized ID: `french-numbers`
+- All API responses use normalized deck IDs
+
 ```json
 {
-  "id": "deck-id-must-match-filename",
+  "id": "deck-id-will-be-normalized-from-filename",
   "title": "Deck Title",
   "description": "Optional description",
   "cards": [
@@ -165,15 +177,20 @@ Deck JSON files are located in `backend/app/content/decks/`. Each deck file must
 ```
 
 **Required fields:**
-- `id` (string): Must match filename without `.json` extension
+- `id` (string): Will be normalized from filename stem (kebab-case)
 - `title` (string): Display name for the deck
 - `cards` (array): Array of card objects
 
 **Optional fields:**
 - `description` (string): Brief description of the deck
 
+**Important:** The `id` field in JSON files will be overridden with the normalized filename stem. The `uid` field on cards is computed by the backend and does not need to be included in JSON files.
+
 **Card object:**
 - `id` (string): Unique identifier within the deck
+- `uid` (string, computed): Globally unique identifier in format `<deckId>:<cardId>` (e.g., `spanish-basics:c1`)
+  - Added automatically by the backend; not stored in JSON files
+  - Ensures uniqueness across all decks
 - `front` (string): Text shown on the front of the card
 - `back` (string): Text shown on the back of the card
 
