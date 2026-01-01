@@ -205,6 +205,8 @@
 .study-container {
   padding: 0;
   max-width: 100%;
+  margin-left: -1rem;
+  margin-right: -1rem;
 }
 
 .study-header {
@@ -215,21 +217,26 @@
   background-color: #1a1a1a;
   border-bottom: 1px solid #333;
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
+.study-header .back-button {
+  padding: 0.5rem 0.75rem;
+  min-height: 36px;
+  min-width: 36px;
+  font-size: 0.875rem;
+}
+
 .study-title {
-  flex: 1;
   text-align: center;
-  min-width: 200px;
+  justify-self: center;
 }
 
 .study-title h2 {
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 4vw, 1.25rem);
   margin: 0;
   color: #fff;
 }
@@ -249,7 +256,8 @@
 }
 
 .study-content {
-  padding: 2rem 1rem;
+  padding: 2rem 0;
+  padding-bottom: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -257,14 +265,21 @@
 }
 
 .study-footer {
-  padding: 1rem;
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding: 0.5rem 1rem;
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   border-top: 1px solid #333;
   background-color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.study-footer .study-button {
+  margin-top: 0;
 }
 
 .end-session-button {
-  width: 100%;
   background-color: #f44336;
   color: white;
 }

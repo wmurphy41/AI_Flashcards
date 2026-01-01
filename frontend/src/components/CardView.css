@@ -1,7 +1,10 @@
 .card-view-container {
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
   margin: 0 auto;
+  margin-left: clamp(12px, 4vw, 20px);
+  margin-right: clamp(12px, 4vw, 20px);
+  margin-bottom: 1rem;
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
@@ -14,7 +17,6 @@
   width: 100%;
   aspect-ratio: 16 / 10;
   perspective: 1000px;
-  margin-bottom: 1rem;
 }
 
 .card-side {
@@ -59,7 +61,7 @@
 }
 
 .card-side p {
-  font-size: 1.5rem;
+  font-size: clamp(16px, 4.5vw, 24px);
   font-weight: 500;
   text-align: center;
   margin: 0;
@@ -72,7 +74,7 @@
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
   color: #888;
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .swipe-left,
@@ -83,10 +85,6 @@
 @media (max-width: 480px) {
   .card-side {
     padding: 1.5rem;
-  }
-  
-  .card-side p {
-    font-size: 1.25rem;
   }
   
   .swipe-hint {
