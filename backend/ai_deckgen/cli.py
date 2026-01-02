@@ -104,16 +104,46 @@ def cmd_preview(args):
 
 def cmd_validate(args):
     """Validate a deck file."""
-    validator = DeckValidator()
-    is_valid, errors = validator.validate_file(args.path)
+    from .storage import DeckStorage
     
-    if not is_valid:
-        print(f"Validation failed:")
-        for error in errors:
-            print(f"  - {error}")
+    validator = DeckValidator()
+    storage = DeckStorage()
+    
+    # Check if input is a deck ID (no .json extension) or a path
+    deck_path = args.path
+    path_obj = Path(deck_path)
+    
+    if not path_obj.suffix == '.json':
+        # Try to find by deck ID
+        deck_file = _find_deck_file(storage, deck_path)
+        if deck_file is None:
+            print(f"Error: Deck '{deck_path}' not found.", file=sys.stderr)
+            sys.exit(1)
+        deck_path = str(deck_file)
+    
+    normalized, warnings, errors = validator.validate_and_repair_file(deck_path)
+    
+    if normalized is None or errors:
+        print("INVALID")
+        if normalized is None:
+            # File loading failed, errors already set
+            pass
+        else:
+            print("\nErrors:")
+            for error in errors:
+                print(f"  - {error}")
         sys.exit(1)
-    else:
-        print("Validation passed.")
+    
+    # Validation succeeded
+    print("VALID")
+    print(f"Deck ID: {normalized['id']}")
+    print(f"Title: {normalized['title']}")
+    print(f"Card count: {len(normalized['cards'])}")
+    
+    if warnings:
+        print("\nWARNINGS:")
+        for warning in warnings:
+            print(f"  - {warning}")
 
 
 def cmd_generate(args):
