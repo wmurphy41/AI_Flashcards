@@ -89,6 +89,7 @@
   width: 100%;
   max-width: 250px;
   gap: 100px;
+  justify-content: flex-end
 }
 
 .swipe-left {
