@@ -24,7 +24,7 @@ export function CreateDeck({ onSuccess, onCancel }: CreateDeckProps) {
     setError(null);
 
     try {
-      const response = await generateDeck(description);
+      const response = await generateDeck({ description });
       onSuccess(response.deck, response.truncated);
     } catch (err: any) {
       setError({

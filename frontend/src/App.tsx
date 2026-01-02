@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getDecks, getDeck, generateDeck, type DeckSummary, type Deck } from './api'
+import { getDecks, getDeck, type DeckSummary, type Deck } from './api'
 import { CardView } from './components/CardView'
 import { SessionSetup } from './components/SessionSetup'
 import { DetailedResults } from './components/DetailedResults'

@@ -54,13 +54,13 @@ export async function getDeck(id: string): Promise<Deck> {
   return response.json();
 }
 
-export async function generateDeck(description: string): Promise<GenerateDeckResponse> {
+export async function generateDeck(req: GenerateDeckRequest): Promise<GenerateDeckResponse> {
   const response = await fetch('/api/ai/decks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ description }),
+    body: JSON.stringify(req),
   });
 
   if (!response.ok) {
