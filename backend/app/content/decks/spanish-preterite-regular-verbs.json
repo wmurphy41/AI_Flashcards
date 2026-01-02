@@ -2,6 +2,8 @@
     "id": "spanish-preterite-regular-verbs",
     "title": "Spanish Regular Preterite Verbs",
     "description": "Practice common Spanish regular verbs conjugated in the past preterite tense. These cards focus on matching English 'used to' sentences to their correct Spanish preterite forms. Front of card: English sentence using 'used to'; back of card: Spanish sentence in the preterite.",
+    "source":"manual",
+    "generated_at":"2025-12-28",
     "cards": [
         {"id": "c1", "front": "I used to speak.", "back": "Yo hablé."},
         {"id": "c2", "front": "You used to work.", "back": "Tú trabajaste."},

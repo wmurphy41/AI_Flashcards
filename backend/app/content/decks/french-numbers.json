@@ -2,6 +2,8 @@
   "id": "french-numbers",
   "title": "French Numbers",
   "description": "French numbers from 1 - 10 with French on the front and English on the back.",
+  "source":"manual",
+  "generated_at":"2025-12-28",
   "cards": [
     { "id": "n1", "front": "un", "back": "one" },
     { "id": "n2", "front": "deux", "back": "two" },
