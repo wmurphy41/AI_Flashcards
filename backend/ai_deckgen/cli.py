@@ -148,8 +148,33 @@ def cmd_validate(args):
 
 def cmd_generate(args):
     """Generate a deck from a description."""
-    print("Error: Deck generation not implemented yet.", file=sys.stderr)
-    sys.exit(1)
+    from .generator import DeckGenerator
+    
+    try:
+        generator = DeckGenerator()
+        deck_data = generator.generate(args.description)
+        
+        # Print success information
+        print("VALID (normalized, not yet written)")
+        print(f"Deck ID: {deck_data['id']}")
+        print(f"Title: {deck_data['title']}")
+        print(f"Card count: {len(deck_data['cards'])}")
+        
+        # Optionally show warnings if we had any (they're in the normalized deck)
+        # For now, we'll just show the basic info
+        
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except RuntimeError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error: Unexpected error during generation: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def main():
