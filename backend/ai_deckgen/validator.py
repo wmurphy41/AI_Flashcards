@@ -12,7 +12,7 @@ class DeckValidator:
     
     # Field length constants
     MAX_TITLE_LENGTH = 80
-    MAX_DESCRIPTION_LENGTH = 280
+    MAX_DESCRIPTION_LENGTH = 120
     MAX_FRONT_LENGTH = 120
     MAX_BACK_LENGTH = 120
     MAX_CARDS = 50

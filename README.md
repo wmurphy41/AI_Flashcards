@@ -146,7 +146,7 @@ Returns 404 with `{"detail":"Deck not found"}` if deck doesn't exist.
 
 ## AI Deck Generation
 
-The `ai_deckgen` package provides tools for generating flashcard decks using AI.
+The `ai_deckgen` package provides command-line tools and API endpoints for generating flashcard decks using AI.
 
 ### Setup
 
@@ -157,14 +157,71 @@ The `ai_deckgen` package provides tools for generating flashcard decks using AI.
    ```
 
 2. Set your OpenAI API key:
-   ```bash
-   export OPENAI_API_KEY=your_api_key_here
+
+   **Local development:**
+   ```powershell
+   $env:OPENAI_API_KEY="sk-your-key-here"
+   uvicorn app.main:app --reload
+   ```
+
+   **Docker Compose:**
+   Add to `docker-compose.yml` under the `backend` service:
+   ```yaml
+   environment:
+     - OPENAI_API_KEY=${OPENAI_API_KEY}
    ```
    
-   Alternatively, you can create a `.env` file in the project root (this file is git-ignored):
+   Then set the variable before running:
+   ```powershell
+   $env:OPENAI_API_KEY="sk-your-key-here"
+   docker compose up --build
    ```
-   OPENAI_API_KEY=your_api_key_here
-   ```
+
+### API Endpoint
+
+**POST /api/ai/decks**
+
+Generate a new deck using AI. The description input is limited to 2000 characters (truncated if longer). The generated deck's description field will be limited to 120 characters.
+
+Request body:
+```json
+{
+  "description": "Create a deck for Spanish irregular preterite verbs"
+}
+```
+
+Response:
+```json
+{
+  "deck": {
+    "id": "spanish-irregular-preterite-verbs",
+    "title": "Spanish Irregular Preterite Verbs",
+    "description": "...",
+    "source": "openai:gpt-4o-mini",
+    "generated_at": "2026-01-01",
+    "cards": [...]
+  },
+  "path": "spanish-irregular-preterite-verbs.json",
+  "truncated": false
+}
+```
+
+**Example with curl (bash/Unix):**
+```bash
+curl -X POST http://localhost:8000/api/ai/decks \
+  -H "Content-Type: application/json" \
+  -d '{"description":"Create a deck for Spanish irregular preterite verbs"}'
+```
+
+**Example with PowerShell:**
+```powershell
+Invoke-RestMethod -Uri http://localhost:8000/api/ai/decks -Method POST -ContentType "application/json" -Body '{"description":"Create a deck for Spanish irregular preterite verbs"}'
+```
+
+**Alternative: Use curl.exe in PowerShell:**
+```powershell
+curl.exe -X POST http://localhost:8000/api/ai/decks -H "Content-Type: application/json" -d "{\"description\":\"Create a deck for Spanish irregular preterite verbs\"}"
+```
 
 ### CLI Usage
 
