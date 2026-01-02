@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { getDecks, getDeck, type DeckSummary, type Deck } from './api'
+import { getDecks, getDeck, generateDeck, type DeckSummary, type Deck } from './api'
 import { CardView } from './components/CardView'
 import { SessionSetup } from './components/SessionSetup'
 import { DetailedResults } from './components/DetailedResults'
 import { ConfirmDialog } from './components/ConfirmDialog'
+import { CreateDeck } from './components/CreateDeck'
 import {
   initSession,
   applyAnswer,
@@ -14,7 +15,7 @@ import {
 import { computeScores, computeBreakdown } from './sessionStats'
 import './App.css'
 
-type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results'
+type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'create-deck'
 
 function App() {
   const [view, setView] = useState<View>('list')
@@ -26,21 +27,26 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showEndSessionConfirm, setShowEndSessionConfirm] = useState(false)
+  const [toast, setToast] = useState<{ message: string; truncated?: boolean } | null>(null)
 
-  // Load deck list on mount
+  // Load deck list on mount and when returning to list view
+  const refreshDeckList = () => {
+    setLoading(true)
+    setError(null)
+    getDecks()
+      .then((data) => {
+        setDecks(data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
+      })
+  }
+
   useEffect(() => {
     if (view === 'list') {
-      setLoading(true)
-      setError(null)
-      getDecks()
-        .then((data) => {
-          setDecks(data)
-          setLoading(false)
-        })
-        .catch((err) => {
-          setError(err.message)
-          setLoading(false)
-        })
+      refreshDeckList()
     }
   }, [view])
 
@@ -80,7 +86,38 @@ function App() {
       setView('detail')
       setSessionState(null)
       setSessionOptions(null)
+    } else if (view === 'create-deck') {
+      setView('list')
     }
+  }
+
+  const handleCreateDeck = () => {
+    setView('create-deck')
+  }
+
+  const handleCreateDeckSuccess = async (deck: Deck, truncated?: boolean) => {
+    // Show toast
+    setToast({
+      message: `Deck created: ${deck.title || deck.id}`,
+      truncated,
+    })
+
+    // Refresh deck list
+    refreshDeckList()
+
+    // Navigate to the new deck
+    setSelectedDeckId(deck.id)
+    setSelectedDeck(deck)
+    setView('detail')
+
+    // Clear toast after 3 seconds
+    setTimeout(() => {
+      setToast(null)
+    }, 3000)
+  }
+
+  const handleCreateDeckCancel = () => {
+    setView('list')
   }
 
   const handleShowDetailedResults = () => {
@@ -249,6 +286,15 @@ function App() {
           />
         )}
       </div>
+    )
+  }
+
+  if (view === 'create-deck') {
+    return (
+      <CreateDeck
+        onSuccess={handleCreateDeckSuccess}
+        onCancel={handleCreateDeckCancel}
+      />
     )
   }
 
@@ -427,29 +473,44 @@ function App() {
             </div>
           )}
           {!loading && !error && (
-          <div className="deck-list">
-            {decks.length === 0 ? (
-              <p>No decks available</p>
-            ) : (
-              decks.map((deck) => (
-                <div
-                  key={deck.id}
-                  className="deck-item"
-                  onClick={() => handleDeckSelect(deck.id)}
-                >
-                  <h3 className="deck-title">{deck.title}</h3>
-                  {deck.description && (
-                    <p className="deck-description">{deck.description}</p>
-                  )}
-                  <p className="deck-count">
-                    {deck.card_count} card{deck.card_count !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+            <>
+              <div className="create-deck-button-container">
+                <button className="study-button create-deck-primary-button" onClick={handleCreateDeck}>
+                  + Create Deck
+                </button>
+              </div>
+              <div className="deck-list">
+                {decks.length === 0 ? (
+                  <p>No decks available</p>
+                ) : (
+                  decks.map((deck) => (
+                    <div
+                      key={deck.id}
+                      className="deck-item"
+                      onClick={() => handleDeckSelect(deck.id)}
+                    >
+                      <h3 className="deck-title">{deck.title}</h3>
+                      {deck.description && (
+                        <p className="deck-description">{deck.description}</p>
+                      )}
+                      <p className="deck-count">
+                        {deck.card_count} card{deck.card_count !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
+          )}
       </div>
+      {toast && (
+        <div className="toast">
+          <div className="toast-content">
+            <span className="toast-message">{toast.message}</span>
+            {toast.truncated && <span className="toast-note">(input truncated)</span>}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

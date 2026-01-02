@@ -78,6 +78,28 @@
   margin-top: 2rem;
 }
 
+.create-deck-button-container {
+  margin-bottom: 1.5rem;
+}
+
+.create-deck-primary-button {
+  width: 100%;
+  min-height: 56px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  background-color: #646cff;
+  color: white;
+  border: none;
+}
+
+.create-deck-primary-button:hover {
+  background-color: #535bf2;
+}
+
+.create-deck-primary-button:active {
+  background-color: #4a52d8;
+}
+
 .deck-list {
   display: flex;
   flex-direction: column;
@@ -531,5 +553,63 @@
   .study-footer {
     border-top-color: #ddd;
     background-color: transparent;
+  }
+
+  .toast {
+    background-color: #ffffff;
+    border-color: #ccc;
+  }
+
+  .toast-message {
+    color: #213547;
+  }
+
+  .toast-note {
+    color: #666;
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  width: 100%;
+  max-width: 500px;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toast-message {
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.toast-note {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
   }
 }

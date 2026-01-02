@@ -20,6 +20,21 @@ type Deck = {
   cards: Card[];
 };
 
+type GenerateDeckRequest = {
+  description: string;
+};
+
+type GenerateDeckResponse = {
+  deck: Deck;
+  path: string;
+  truncated: boolean;
+};
+
+type ApiError = {
+  error: string;
+  details?: string[];
+};
+
 export async function getDecks(): Promise<DeckSummary[]> {
   const response = await fetch('/api/decks');
   if (!response.ok) {
@@ -39,5 +54,25 @@ export async function getDeck(id: string): Promise<Deck> {
   return response.json();
 }
 
+export async function generateDeck(description: string): Promise<GenerateDeckResponse> {
+  const response = await fetch('/api/ai/decks', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ description }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    const apiError = errorData as ApiError;
+    const error = new Error(apiError.error || `Failed to generate deck: ${response.statusText}`);
+    (error as any).details = apiError.details || [];
+    throw error;
+  }
+
+  return response.json();
+}
+
 // Export types for use in other files
-export type { Card, DeckSummary, Deck };
+export type { Card, DeckSummary, Deck, GenerateDeckResponse, ApiError };
