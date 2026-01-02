@@ -149,19 +149,21 @@ def cmd_validate(args):
 def cmd_generate(args):
     """Generate a deck from a description."""
     from .generator import DeckGenerator
+    from .storage import DeckStorage
     
     try:
         generator = DeckGenerator()
         deck_data = generator.generate(args.description)
         
-        # Print success information
-        print("VALID (normalized, not yet written)")
-        print(f"Deck ID: {deck_data['id']}")
-        print(f"Title: {deck_data['title']}")
-        print(f"Card count: {len(deck_data['cards'])}")
+        # Persist to disk
+        storage = DeckStorage()
+        file_path = storage.write_deck(deck_data)
         
-        # Optionally show warnings if we had any (they're in the normalized deck)
-        # For now, we'll just show the basic info
+        # Print success information
+        print("DECK CREATED")
+        print(f"Deck ID: {deck_data['id']}")
+        print(f"File path: {file_path}")
+        print(f"Card count: {len(deck_data['cards'])}")
         
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
@@ -170,6 +172,9 @@ def cmd_generate(args):
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
     except RuntimeError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except OSError as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:

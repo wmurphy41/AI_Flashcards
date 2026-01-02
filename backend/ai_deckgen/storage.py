@@ -1,8 +1,10 @@
 """Deck storage utilities for reading and writing deck files."""
 
+import json
+import tempfile
 from pathlib import Path
 from typing import List, Optional
-import json
+import os
 
 
 class DeckStorage:
@@ -65,4 +67,85 @@ class DeckStorage:
         deck_path.parent.mkdir(parents=True, exist_ok=True)
         with open(deck_path, 'w', encoding='utf-8') as f:
             json.dump(deck_data, f, indent=2, ensure_ascii=False)
-
+    
+    def _resolve_collision_safe_path(self, base_deck_id: str) -> Tuple[Path, str]:
+        """
+        Resolve a collision-safe file path and deck ID.
+        
+        Args:
+            base_deck_id: Base deck ID (without suffix)
+            
+        Returns:
+            Tuple of (file_path, resolved_deck_id)
+        """
+        # Ensure directory exists
+        self.decks_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Try base ID first
+        base_path = self.decks_dir / f"{base_deck_id}.json"
+        if not base_path.exists():
+            return base_path, base_deck_id
+        
+        # Try with suffixes -2, -3, etc.
+        suffix = 2
+        while True:
+            resolved_id = f"{base_deck_id}-{suffix}"
+            resolved_path = self.decks_dir / f"{resolved_id}.json"
+            if not resolved_path.exists():
+                return resolved_path, resolved_id
+            suffix += 1
+    
+    def write_deck(self, deck: dict) -> Path:
+        """
+        Write a deck to disk with collision-safe ID resolution.
+        
+        Args:
+            deck: Dictionary containing the deck data (will be modified to update 'id')
+            
+        Returns:
+            Path to the written file
+            
+        Raises:
+            OSError: If file write fails
+        """
+        base_deck_id = deck.get('id', 'unknown-deck')
+        
+        # Resolve collision-safe path and ID
+        file_path, resolved_id = self._resolve_collision_safe_path(base_deck_id)
+        
+        # Update deck ID to match resolved filename
+        deck['id'] = resolved_id
+        
+        # Ensure directory exists
+        self.decks_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Write atomically using temp file + rename
+        try:
+            # Create temp file in the same directory
+            temp_fd, temp_path = tempfile.mkstemp(
+                suffix='.json',
+                dir=self.decks_dir,
+                prefix='.deck-',
+                text=True
+            )
+            
+            try:
+                # Write JSON to temp file
+                with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
+                    json.dump(deck, f, indent=2, ensure_ascii=False)
+                
+                # Atomic rename
+                os.replace(temp_path, file_path)
+                
+            except Exception:
+                # Clean up temp file on error
+                try:
+                    os.unlink(temp_path)
+                except OSError:
+                    pass
+                raise
+        
+        except OSError as e:
+            raise OSError(f"Failed to write deck file: {e}")
+        
+        return file_path
