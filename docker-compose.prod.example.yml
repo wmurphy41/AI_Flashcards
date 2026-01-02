@@ -1,23 +1,111 @@
+#
+# ===============================
+# AI Flashcards — Production Deployment (AWS)
+# ===============================
+#
+# This file is a TEMPLATE for production deployment using Docker Compose
+# and images pulled from GitHub Container Registry (GHCR).
+#
+# Do NOT commit secrets to this file.
+#
+# -------------------------------
+# Prerequisites (on AWS host)
+# -------------------------------
+# - Docker + Docker Compose installed
+# - Logged into GHCR:
+#     docker login ghcr.io -u <github-username>
+# - Server-level nginx installed and configured as reverse proxy
+#
+# -------------------------------
+# Setup Steps
+# -------------------------------
+# 1) Copy this template to create the real production file:
+#     cp docker-compose.prod.example.yml docker-compose.prod.yml
+#
+# 2) Create a .env file for secrets (DO NOT COMMIT):
+#     nano .env
+#
+#    Example contents:
+#     OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
+#
+#    Secure it:
+#     chmod 600 .env
+#
+# 3) Pull images from GHCR:
+#     docker compose -f docker-compose.prod.yml pull
+#
+# 4) Start services:
+#     docker compose -f docker-compose.prod.yml up -d
+#
+# 5) Verify containers:
+#     docker ps
+#
+# 6) Verify health:
+#     curl http://localhost:8000/api/health
+#
+# -------------------------------
+# Notes
+# -------------------------------
+# - Services bind to localhost only; nginx should proxy public traffic.
+# - Deck data is persisted using a Docker volume.
+# - Restart policy is 'unless-stopped'.
+# - Healthchecks are enabled for both services.
+#
+# - Frontend is expected to be served at root (/) initially.
+#   Path-based routing (e.g. /flashcards) requires additional nginx
+#   configuration and a frontend rebuild with correct Vite base path.
+#
+# ===============================
+version: "3.9"
+
 services:
   backend:
-    image: ghcr.io/wmurphy41/ai_flashcards-backend:v1.0.0
+    image: ghcr.io/wmurphy41/ai_flashcards-backend:v1.2.0
+    container_name: ai_flashcards-backend
+    restart: unless-stopped
+    env_file:
+      - .env
     ports:
-      - "8000:8000"
+      # Bind to localhost only; nginx will proxy public traffic
+      - "127.0.0.1:8000:8000"
     networks:
       - app-network
-    restart: unless-stopped
+    volumes:
+      # Persist decks across container recreations
+      - decks-data:/app/app/content/decks
+    healthcheck:
+      # Uses python stdlib (works on python-slim without installing curl)
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=3).read()\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   frontend:
-    image: ghcr.io/wmurphy41/ai_flashcards-frontend:v1.0.0
+    image: ghcr.io/wmurphy41/ai_flashcards-frontend:v1.2.0
+    container_name: ai_flashcards-frontend
+    restart: unless-stopped
     ports:
-      - "80:80"
+      # Bind to localhost only; nginx will proxy public traffic
+      - "127.0.0.1:8081:80"
     networks:
       - app-network
     depends_on:
-      - backend
-    restart: unless-stopped
+      backend:
+        condition: service_healthy
+    healthcheck:
+      # nginx:alpine includes busybox wget; this should work without extra installs
+      test: ["CMD-SHELL", "wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   app-network:
+    name: ai_flashcards_app-network
     driver: bridge
 
+volumes:
+  decks-data:
+    name: ai_flashcards_decks_data
