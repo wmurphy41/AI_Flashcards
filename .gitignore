@@ -38,3 +38,4 @@ dist-ssr/
 ehthumbs.db
 Thumbs.db
 
+.cursor/ 
