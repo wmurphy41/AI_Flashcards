@@ -31,7 +31,8 @@ type GenerateDeckResponse = {
 };
 
 type ApiError = {
-  error: string;
+  error?: string;
+  detail?: string;
   details?: string[];
 };
 
@@ -91,7 +92,7 @@ export async function deleteDeck(deckId: string): Promise<void> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
     const apiError = errorData as ApiError;
-    const error = new Error(apiError.error || `Failed to delete deck: ${response.statusText}`);
+    const error = new Error(apiError.detail || apiError.error || `Failed to delete deck: ${response.statusText}`);
     (error as any).status = response.status;
     (error as any).details = apiError.details || [];
     throw error;
