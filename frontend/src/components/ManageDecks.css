@@ -1,0 +1,32 @@
+.manage-decks-helper {
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem;
+}
+
+.deck-item-system {
+  opacity: 0.6;
+  background-color: rgba(128, 128, 128, 0.1);
+}
+
+.deck-item-system .deck-title,
+.deck-item-system .deck-description,
+.deck-item-system .deck-count {
+  color: #888;
+}
+
+/* Light mode support */
+@media (prefers-color-scheme: light) {
+  .deck-item-system {
+    background-color: rgba(128, 128, 128, 0.05);
+  }
+
+  .deck-item-system .deck-title,
+  .deck-item-system .deck-description,
+  .deck-item-system .deck-count {
+    color: #666;
+  }
+}
+

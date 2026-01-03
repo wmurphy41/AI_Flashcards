@@ -5,6 +5,7 @@ import { SessionSetup } from './components/SessionSetup'
 import { DetailedResults } from './components/DetailedResults'
 import { ConfirmDialog } from './components/ConfirmDialog'
 import { CreateDeck } from './components/CreateDeck'
+import { ManageDecks } from './components/ManageDecks'
 import {
   initSession,
   applyAnswer,
@@ -15,7 +16,7 @@ import {
 import { computeScores, computeBreakdown } from './sessionStats'
 import './App.css'
 
-type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'create-deck'
+type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'create-deck' | 'manage-decks'
 
 function App() {
   const [view, setView] = useState<View>('list')
@@ -45,7 +46,7 @@ function App() {
   }
 
   useEffect(() => {
-    if (view === 'list') {
+    if (view === 'list' || view === 'manage-decks') {
       refreshDeckList()
     }
   }, [view])
@@ -86,13 +87,17 @@ function App() {
       setView('detail')
       setSessionState(null)
       setSessionOptions(null)
-    } else if (view === 'create-deck') {
+    } else if (view === 'create-deck' || view === 'manage-decks') {
       setView('list')
     }
   }
 
   const handleCreateDeck = () => {
     setView('create-deck')
+  }
+
+  const handleManageDecks = () => {
+    setView('manage-decks')
   }
 
   const handleCreateDeckSuccess = async (deck: Deck, truncated?: boolean) => {
@@ -298,6 +303,17 @@ function App() {
     )
   }
 
+  if (view === 'manage-decks') {
+    return (
+      <ManageDecks
+        decks={decks}
+        loading={loading}
+        error={error}
+        onBack={handleBack}
+      />
+    )
+  }
+
   if (view === 'setup' && selectedDeck) {
     return (
       <SessionSetup
@@ -477,6 +493,9 @@ function App() {
               <div className="create-deck-button-container">
                 <button className="study-button create-deck-primary-button" onClick={handleCreateDeck}>
                   + Create Deck
+                </button>
+                <button className="study-button manage-decks-button" onClick={handleManageDecks}>
+                  Manage Decks
                 </button>
               </div>
               <div className="deck-list">
