@@ -35,8 +35,17 @@ type ApiError = {
   details?: string[];
 };
 
+const API_BASE = import.meta.env.VITE_API_BASE ?? '/api';
+
+// Ensure API_BASE ends with a single slash, then append path without leading slash
+const apiUrl = (path: string): string => {
+  const base = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${base}/${cleanPath}`;
+};
+
 export async function getDecks(): Promise<DeckSummary[]> {
-  const response = await fetch('/api/decks');
+  const response = await fetch(apiUrl('decks'));
   if (!response.ok) {
     throw new Error(`Failed to fetch decks: ${response.statusText}`);
   }
@@ -44,7 +53,7 @@ export async function getDecks(): Promise<DeckSummary[]> {
 }
 
 export async function getDeck(id: string): Promise<Deck> {
-  const response = await fetch(`/api/decks/${id}`);
+  const response = await fetch(apiUrl(`decks/${id}`));
   if (!response.ok) {
     if (response.status === 404) {
       throw new Error('Deck not found');
@@ -55,7 +64,7 @@ export async function getDeck(id: string): Promise<Deck> {
 }
 
 export async function generateDeck(req: GenerateDeckRequest): Promise<GenerateDeckResponse> {
-  const response = await fetch('/api/ai/decks', {
+  const response = await fetch(apiUrl('ai/decks'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

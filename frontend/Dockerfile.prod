@@ -3,6 +3,12 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ARG VITE_BASE_PATH=/flashcards/
+ARG VITE_API_BASE=/flashcards/api
+
+ENV VITE_BASE_PATH=$VITE_BASE_PATH
+ENV VITE_API_BASE=$VITE_API_BASE
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
