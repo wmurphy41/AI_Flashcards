@@ -1,11 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 import sys
 from pathlib import Path
 
-from .content_loader import list_decks, get_deck
+from .content_loader import list_decks, get_deck, resolve_deck_file_path
 from .schemas import DeckSummary, Deck
 
 # Import ai_deckgen service
@@ -51,6 +51,51 @@ async def get_deck_by_id(deck_id: str):
         return get_deck(deck_id)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Deck not found")
+
+
+@app.delete("/api/decks/{deck_id}")
+async def delete_deck(deck_id: str):
+    """
+    Delete a deck by ID.
+    
+    Only allows deletion of user-created (LLM-generated) decks.
+    System decks (source="manual") cannot be deleted and return 403.
+    """
+    try:
+        # Resolve the deck file path
+        deck_file = resolve_deck_file_path(deck_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    
+    # Read the deck JSON to check the source field
+    try:
+        with open(deck_file, "r", encoding="utf-8") as f:
+            deck_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to read deck file: {str(e)}"
+        )
+    
+    # Check if this is a system/manual deck
+    source = deck_data.get("source", "").strip()
+    if source == "manual":
+        raise HTTPException(
+            status_code=403,
+            detail="Cannot delete system deck (source='manual')"
+        )
+    
+    # Delete the file
+    try:
+        deck_file.unlink()
+    except OSError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete deck file: {str(e)}"
+        )
+    
+    # Return 204 No Content on success
+    return Response(status_code=204)
 
 
 @app.post("/api/ai/decks")

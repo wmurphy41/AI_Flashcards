@@ -115,3 +115,26 @@ def get_deck(deck_id: str) -> Deck:
     
     return _load_deck_from_file(deck_file)
 
+
+def resolve_deck_file_path(deck_id: str) -> Path:
+    """
+    Resolve the file path for a deck ID.
+    
+    Args:
+        deck_id: The deck ID (will be normalized)
+        
+    Returns:
+        Path to the deck JSON file
+        
+    Raises:
+        FileNotFoundError: If the deck file does not exist
+    """
+    decks_dir = _get_decks_directory()
+    normalized_id = _normalize_deck_id(deck_id)
+    deck_file = decks_dir / f"{normalized_id}.json"
+    
+    if not deck_file.exists():
+        raise FileNotFoundError(f"Deck '{deck_id}' not found")
+    
+    return deck_file
+
