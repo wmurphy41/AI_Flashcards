@@ -110,7 +110,7 @@ export function ManageDecks({ decks, loading, error, onBack, onRefresh }: Manage
     <div className="app-container">
       <div className="header">
         <button className="back-button" onClick={onBack}>
-          ← Back
+          Back
         </button>
         <h1>Manage Decks</h1>
       </div>
@@ -162,7 +162,6 @@ export function ManageDecks({ decks, loading, error, onBack, onRefresh }: Manage
                             onClick={() => handleDeleteClick(deck)}
                             disabled={isDeleting}
                           >
-                            Delete
                           </button>
                         </div>
                       )}

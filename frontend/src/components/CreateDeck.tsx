@@ -46,7 +46,7 @@ export function CreateDeck({ onSuccess, onCancel }: CreateDeckProps) {
     <div className="app-container">
       <div className="header">
         <button className="back-button" onClick={onCancel}>
-          ← Back
+          Back
         </button>
         <h1>Create Deck</h1>
       </div>

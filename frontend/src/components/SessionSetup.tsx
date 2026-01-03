@@ -21,7 +21,7 @@ export function SessionSetup({ deck, onStart, onCancel }: SessionSetupProps) {
     <div className="app-container">
       <div className="header">
         <button className="back-button" onClick={onCancel}>
-          ← Back
+          Back
         </button>
         <h1>Session Setup</h1>
       </div>

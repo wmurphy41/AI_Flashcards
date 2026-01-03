@@ -43,7 +43,7 @@ export function DetailedResults({
     <div className="app-container">
       <div className="header">
         <button className="back-button" onClick={onBack}>
-          ← Back
+          Back
         </button>
         <h1>Detailed Results</h1>
       </div>

@@ -246,7 +246,7 @@ function App() {
         <div className="app-container study-container">
           <div className="study-header">
             <button className="back-button" onClick={handleBack}>
-              ← Back
+              Back
             </button>
             <div className="study-title">
               <h2>{selectedDeck.title}</h2>
@@ -274,7 +274,7 @@ function App() {
         <div className="app-container study-container">
           <div className="study-header">
             <button className="back-button" onClick={handleBack}>
-              ← Back
+              Back
             </button>
             <div className="study-title">
               <h2>{selectedDeck.title}</h2>
@@ -296,7 +296,7 @@ function App() {
       <div className="app-container study-container">
         <div className="study-header">
           <button className="back-button" onClick={handleBack}>
-            ← Back
+            Back
           </button>
             <div className="study-title">
               <h2>{selectedDeck.title || 'Study Session'}</h2>
@@ -382,7 +382,7 @@ function App() {
       <div className="app-container">
         <div className="header">
           <button className="back-button" onClick={handleBack}>
-            ← Back
+            Back
           </button>
           <h1>AI Flashcards</h1>
         </div>
@@ -456,7 +456,7 @@ function App() {
       <div className="app-container">
         <div className="header">
           <button className="back-button" onClick={handleBack}>
-            ← Back
+            Back
           </button>
           <h1>AI Flashcards</h1>
         </div>

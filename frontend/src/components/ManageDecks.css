@@ -49,17 +49,22 @@
 }
 
 .deck-delete-button {
-  background-color: #dc3545;
+  background-color: #f44336;
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  font-size: 0;
   cursor: pointer;
-  min-height: 44px;
-  touch-action: manipulation;
+  border-radius: 50%;
   transition: background-color 0.2s;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .deck-delete-button:hover {
