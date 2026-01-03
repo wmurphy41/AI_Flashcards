@@ -6,6 +6,26 @@
   padding: 0.5rem;
 }
 
+.deck-item-container {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.deck-item {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.3s ease;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
 .deck-item-system {
   opacity: 0.6;
   background-color: rgba(128, 128, 128, 0.1);
@@ -17,8 +37,51 @@
   color: #888;
 }
 
+.deck-item-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  z-index: 0;
+  padding-right: 1rem;
+}
+
+.deck-delete-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  touch-action: manipulation;
+  transition: background-color 0.2s;
+}
+
+.deck-delete-button:hover {
+  background-color: #c82333;
+}
+
+.deck-delete-button:active {
+  background-color: #bd2130;
+}
+
+.deck-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Light mode support */
 @media (prefers-color-scheme: light) {
+  .deck-item {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+  }
+
   .deck-item-system {
     background-color: rgba(128, 128, 128, 0.05);
   }
@@ -27,6 +90,18 @@
   .deck-item-system .deck-description,
   .deck-item-system .deck-count {
     color: #666;
+  }
+
+  .deck-delete-button {
+    background-color: #dc3545;
+  }
+
+  .deck-delete-button:hover {
+    background-color: #c82333;
+  }
+
+  .deck-delete-button:active {
+    background-color: #bd2130;
   }
 }
 

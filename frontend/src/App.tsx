@@ -310,6 +310,7 @@ function App() {
         loading={loading}
         error={error}
         onBack={handleBack}
+        onRefresh={refreshDeckList}
       />
     )
   }

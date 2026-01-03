@@ -83,5 +83,25 @@ export async function generateDeck(req: GenerateDeckRequest): Promise<GenerateDe
   return response.json();
 }
 
+export async function deleteDeck(deckId: string): Promise<void> {
+  const response = await fetch(apiUrl(`decks/${deckId}`), {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    const apiError = errorData as ApiError;
+    const error = new Error(apiError.error || `Failed to delete deck: ${response.statusText}`);
+    (error as any).status = response.status;
+    (error as any).details = apiError.details || [];
+    throw error;
+  }
+
+  // 204 No Content is success
+  if (response.status !== 204) {
+    throw new Error(`Unexpected response status: ${response.status}`);
+  }
+}
+
 // Export types for use in other files
 export type { Card, DeckSummary, Deck, GenerateDeckResponse, ApiError };
