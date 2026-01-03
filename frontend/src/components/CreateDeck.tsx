@@ -61,7 +61,7 @@ export function CreateDeck({ onSuccess, onCancel }: CreateDeckProps) {
               className="create-deck-textarea"
               value={description}
               onChange={handleChange}
-              placeholder="e.g., Create a deck for Spanish irregular preterite verbs"
+              placeholder="e.g., Create a deck for current starting NFL quarterbacks. Put the NFL team name on the front and the quarterback's name on the back."
               maxLength={maxLength}
               rows={8}
               disabled={loading}
