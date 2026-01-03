@@ -483,14 +483,14 @@ function App() {
               <div className="preview-section">
                 <h3>Preview</h3>
                 <ul className="card-preview-list">
-                  {selectedDeck.cards.slice(0, 5).map((card) => (
+                  {selectedDeck.cards.slice(0, 3).map((card) => (
                     <li key={card.uid} className="card-preview-item">
                       {card.front}
                     </li>
                   ))}
-                  {selectedDeck.cards.length > 5 && (
+                  {selectedDeck.cards.length > 3 && (
                     <li className="card-preview-item muted">
-                      ... and {selectedDeck.cards.length - 5} more
+                      ... and {selectedDeck.cards.length - 3} more
                     </li>
                   )}
                 </ul>
