@@ -45,15 +45,48 @@ function App() {
       })
   }
 
+  // Check if a deck exists in the current deck list
+  const isDeckAvailable = (deckId: string): boolean => {
+    return decks.some(deck => deck.id === deckId)
+  }
+
+  // Handle missing deck: navigate home and show toast
+  const handleMissingDeck = () => {
+    setView('list')
+    setSelectedDeckId(null)
+    setSelectedDeck(null)
+    setSessionState(null)
+    setSessionOptions(null)
+    setToast({ message: 'Deck is no longer available' })
+  }
+
   useEffect(() => {
     if (view === 'list' || view === 'manage-decks') {
       refreshDeckList()
     }
   }, [view])
 
+  // Check if selected deck still exists after deck list refresh
+  useEffect(() => {
+    if (selectedDeckId && decks.length > 0) {
+      // Only check if we're in a view that depends on the deck existing
+      if (view === 'detail' || view === 'setup' || view === 'study' || view === 'results' || view === 'detailed-results') {
+        if (!isDeckAvailable(selectedDeckId)) {
+          handleMissingDeck()
+        }
+      }
+    }
+  }, [decks, selectedDeckId, view])
+
   // Load deck details when selected
   useEffect(() => {
     if (view === 'detail' && selectedDeckId) {
+      // Check if deck still exists in list (may have been deleted)
+      if (!isDeckAvailable(selectedDeckId)) {
+        handleMissingDeck()
+        return
+      }
+
       setLoading(true)
       setError(null)
       getDeck(selectedDeckId)
@@ -62,11 +95,16 @@ function App() {
           setLoading(false)
         })
         .catch((err) => {
-          setError(err.message)
-          setLoading(false)
+          // If 404, deck was deleted
+          if (err.message.includes('not found') || err.message.includes('404')) {
+            handleMissingDeck()
+          } else {
+            setError(err.message)
+            setLoading(false)
+          }
         })
     }
-  }, [view, selectedDeckId])
+  }, [view, selectedDeckId, decks])
 
   const handleDeckSelect = (deckId: string) => {
     setSelectedDeckId(deckId)
