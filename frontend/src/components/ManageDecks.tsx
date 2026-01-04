@@ -13,7 +13,7 @@ interface ManageDecksProps {
 
 // Helper function to check if a deck is a system deck
 export function isSystemDeck(deck: DeckSummary & { source?: string }): boolean {
-  return deck.source === 'manual'
+  return deck.source === 'system'
 }
 
 export function ManageDecks({ decks, loading, error, onBack, onRefresh }: ManageDecksProps) {

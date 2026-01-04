@@ -59,7 +59,7 @@ async def delete_deck(deck_id: str):
     Delete a deck by ID.
     
     Only allows deletion of user-created (LLM-generated) decks.
-    System decks (source="manual") cannot be deleted and return 403.
+    System decks (source="system") cannot be deleted and return 403.
     """
     try:
         # Resolve the deck file path
@@ -77,12 +77,12 @@ async def delete_deck(deck_id: str):
             detail=f"Failed to read deck file: {str(e)}"
         )
     
-    # Check if this is a system/manual deck
+    # Check if this is a system deck
     source = deck_data.get("source", "").strip()
-    if source == "manual":
+    if source == "system":
         raise HTTPException(
             status_code=403,
-            detail="Cannot delete system deck (source='manual')"
+            detail="Cannot delete system deck (source='system')"
         )
     
     # Delete the file
