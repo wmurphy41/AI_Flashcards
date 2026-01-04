@@ -31,10 +31,10 @@ function App() {
   const [toast, setToast] = useState<{ message: string; truncated?: boolean } | null>(null)
 
   // Load deck list on mount and when returning to list view
-  const refreshDeckList = () => {
+  const refreshDeckList = (): Promise<void> => {
     setLoading(true)
     setError(null)
-    getDecks()
+    return getDecks()
       .then((data) => {
         setDecks(data)
         setLoading(false)
@@ -42,6 +42,7 @@ function App() {
       .catch((err) => {
         setError(err.message)
         setLoading(false)
+        throw err
       })
   }
 
@@ -145,10 +146,16 @@ function App() {
       truncated,
     })
 
-    // Refresh deck list
-    refreshDeckList()
+    // Refresh deck list and wait for it to complete
+    // This prevents the missing deck check from running before the new deck is in the list
+    try {
+      await refreshDeckList()
+    } catch (err) {
+      // If refresh fails, still navigate to the deck (it was just created)
+      console.error('Failed to refresh deck list after creation:', err)
+    }
 
-    // Navigate to the new deck
+    // Navigate to the new deck (after refresh completes)
     setSelectedDeckId(deck.id)
     setSelectedDeck(deck)
     setView('detail')

@@ -58,20 +58,27 @@ export function SessionSetup({ deck, onStart, onCancel }: SessionSetupProps) {
 
             <div className="setup-control">
               <label htmlFor="max-cycles">Max Cycles</label>
-              <input
-                type="number"
-                id="max-cycles"
-                min="1"
-                max="6"
-                value={maxCycles}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value, 10);
-                  if (value >= 1 && value <= 6) {
-                    setMaxCycles(value);
-                  }
-                }}
-                className="number-input"
-              />
+              <div className="cycle-selector">
+                <button
+                  type="button"
+                  className="cycle-button cycle-decrement"
+                  onClick={() => setMaxCycles(Math.max(1, maxCycles - 1))}
+                  disabled={maxCycles <= 1}
+                  aria-label="Decrease cycles"
+                >
+                  −
+                </button>
+                <span className="cycle-value">{maxCycles}</span>
+                <button
+                  type="button"
+                  className="cycle-button cycle-increment"
+                  onClick={() => setMaxCycles(Math.min(6, maxCycles + 1))}
+                  disabled={maxCycles >= 6}
+                  aria-label="Increase cycles"
+                >
+                  +
+                </button>
+              </div>
               <p className="control-hint">Number of study cycles (1-6)</p>
             </div>
 
