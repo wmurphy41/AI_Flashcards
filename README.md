@@ -54,10 +54,10 @@ This will start both services:
 ### Backend
 
 ```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r backend\requirements.txt
 cd backend
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
@@ -151,9 +151,10 @@ The `ai_deckgen` package provides command-line tools and API endpoints for gener
 ### Setup
 
 1. Install dependencies (if not already installed):
-   ```bash
-   cd backend
-   pip install -r requirements.txt
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r backend\requirements.txt
    ```
 
 2. Set your OpenAI API key:
