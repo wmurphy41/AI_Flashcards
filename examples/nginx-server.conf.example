@@ -1,0 +1,177 @@
+# ===============================
+# AI Flashcards — Server-Level Nginx Configuration
+# ===============================
+#
+# This is the nginx configuration for the HOST SERVER (e.g., AWS EC2, Ubuntu).
+# It runs on the server itself and acts as a reverse proxy in front of Docker containers.
+#
+# -------------------------------
+# When to Use This File
+# -------------------------------
+# - Deploying to a production server (AWS EC2, DigitalOcean, etc.)
+# - Need SSL/TLS termination
+# - Want to serve multiple applications from one server
+# - Need path-based routing (e.g., /flashcards)
+#
+# This configuration sits OUTSIDE Docker and proxies to the containers.
+#
+# -------------------------------
+# Installation Location
+# -------------------------------
+# On Ubuntu/Debian: /etc/nginx/sites-available/ai-flashcards
+# Create symlink: ln -s /etc/nginx/sites-available/ai-flashcards /etc/nginx/sites-enabled/
+# Test config: nginx -t
+# Reload nginx: systemctl reload nginx
+#
+# ===============================
+
+# -------------------------------
+# Option 1: Root Domain Deployment
+# -------------------------------
+# Deploy the app to the root of your domain: https://example.com/
+#
+server {
+    # Listen on port 80 (HTTP) - redirect to HTTPS
+    listen 80;
+    
+    # Replace with your actual domain name
+    server_name example.com www.example.com;
+    
+    # Redirect all HTTP traffic to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+# HTTPS server block for root deployment
+server {
+    listen 443 ssl http2;
+    server_name example.com www.example.com;
+    
+    # -------------------------------
+    # SSL/TLS Configuration
+    # -------------------------------
+    # Replace these paths with your actual SSL certificate files.
+    # Use Let's Encrypt (certbot) for free SSL certificates:
+    #   sudo certbot --nginx -d example.com -d www.example.com
+    #
+    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    
+    # SSL security settings (recommended)
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    
+    # -------------------------------
+    # Security Headers
+    # -------------------------------
+    # Add security headers to protect against common vulnerabilities
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    
+    # -------------------------------
+    # Frontend Proxy
+    # -------------------------------
+    # Proxy all requests to the frontend container
+    # The frontend container listens on localhost:8081 (as configured in docker-compose.prod.yml)
+    location / {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # WebSocket support (if needed in future)
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+    
+    # -------------------------------
+    # Backend API Proxy
+    # -------------------------------
+    # Proxy API requests to the backend container
+    # The backend container listens on localhost:8000 (as configured in docker-compose.prod.yml)
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Increase timeout for long-running AI requests
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 300s;
+    }
+}
+
+# -------------------------------
+# Option 2: Subdirectory Deployment
+# -------------------------------
+# Deploy the app to a subdirectory: https://example.com/flashcards/
+#
+# Uncomment and modify this section if deploying to a subdirectory.
+# You'll also need to:
+# 1. Set VITE_BASE_PATH=/flashcards/ in env.example
+# 2. Rebuild the frontend Docker image with the new base path
+# 3. Update the container nginx config (see nginx-container.conf.example)
+#
+# server {
+#     listen 443 ssl http2;
+#     server_name example.com www.example.com;
+#     
+#     ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+#     
+#     # Security headers
+#     add_header X-Frame-Options "SAMEORIGIN" always;
+#     add_header X-Content-Type-Options "nosniff" always;
+#     add_header X-XSS-Protection "1; mode=block" always;
+#     
+#     # Frontend proxy for subdirectory
+#     location /flashcards/ {
+#         proxy_pass http://127.0.0.1:8081/;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#     }
+#     
+#     # Backend API proxy for subdirectory
+#     location /flashcards/api/ {
+#         proxy_pass http://127.0.0.1:8000/api/;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#         proxy_read_timeout 300s;
+#         proxy_connect_timeout 300s;
+#     }
+# }
+
+# ===============================
+# Notes
+# ===============================
+#
+# 1. Docker containers must be running and accessible on localhost:
+#    - Frontend: http://127.0.0.1:8081
+#    - Backend: http://127.0.0.1:8000
+#
+# 2. Ports 8081 and 8000 are bound to localhost only in docker-compose.prod.yml
+#    This prevents external access, forcing traffic through nginx.
+#
+# 3. SSL certificates:
+#    - Use Let's Encrypt (free): sudo certbot --nginx -d yourdomain.com
+#    - Or use your own certificates and update the paths above
+#
+# 4. After making changes:
+#    - Test: sudo nginx -t
+#    - Reload: sudo systemctl reload nginx
+#
+# 5. Firewall: Ensure ports 80 and 443 are open:
+#    - AWS: Security Group rules
+#    - Ubuntu: sudo ufw allow 80/tcp && sudo ufw allow 443/tcp
+#
+# 6. For multiple domains/apps on one server, create separate server blocks
+#    or use a different nginx config file.

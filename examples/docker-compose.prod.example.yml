@@ -20,7 +20,7 @@
 # Setup Steps
 # -------------------------------
 # 1) Copy this template to create the real production file:
-#     cp docker-compose.prod.example.yml docker-compose.prod.yml
+#     cp examples/docker-compose.prod.example.yml docker-compose.prod.yml
 #
 # 2) Create a .env file for secrets (DO NOT COMMIT):
 #     nano .env

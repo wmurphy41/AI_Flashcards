@@ -90,6 +90,76 @@ If you encounter execution policy errors, run:
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
+## Deployment Examples
+
+Example configuration files for deploying the application to different environments are located in the `examples/` folder. These files include detailed comments explaining each configuration option.
+
+### Available Example Files
+
+- **[`examples/docker-compose.prod.example.yml`](examples/docker-compose.prod.example.yml)** - Production Docker Compose configuration for AWS deployment
+  - Uses pre-built images from GitHub Container Registry (GHCR)
+  - Includes health checks and restart policies
+  - Configured for reverse proxy setup with nginx
+
+- **[`examples/env.example`](examples/env.example)** - Environment variables template
+  - OpenAI API key configuration
+  - Frontend build variables (VITE_BASE_PATH, VITE_API_BASE)
+  - Examples for both root and subdirectory deployments
+  - Copy to `.env` and fill in your actual values
+
+- **[`examples/nginx-container.conf.example`](examples/nginx-container.conf.example)** - Nginx configuration for the frontend Docker container
+  - SPA routing configuration (try_files)
+  - API proxy to backend container
+  - Gzip compression settings
+  - Used inside the production frontend container
+
+- **[`examples/nginx-server.conf.example`](examples/nginx-server.conf.example)** - Server-level nginx configuration for production
+  - Reverse proxy configuration for AWS EC2/Ubuntu servers
+  - SSL/TLS configuration with Let's Encrypt
+  - Security headers
+  - Examples for root domain and subdirectory deployments
+  - Sits outside Docker and proxies to containers
+
+### Production Deployment Workflow
+
+1. **Prepare environment variables:**
+   ```bash
+   cp examples/env.example .env
+   # Edit .env with your actual values
+   chmod 600 .env
+   ```
+
+2. **Set up Docker Compose:**
+   ```bash
+   cp examples/docker-compose.prod.example.yml docker-compose.prod.yml
+   # Edit docker-compose.prod.yml if needed (update image tags, etc.)
+   ```
+
+3. **Configure server-level nginx:**
+   ```bash
+   # Copy and customize the server nginx config
+   sudo cp examples/nginx-server.conf.example /etc/nginx/sites-available/ai-flashcards
+   sudo nano /etc/nginx/sites-available/ai-flashcards
+   # Update domain name, SSL certificate paths, etc.
+   sudo ln -s /etc/nginx/sites-available/ai-flashcards /etc/nginx/sites-enabled/
+   sudo nginx -t
+   sudo systemctl reload nginx
+   ```
+
+4. **Start services:**
+   ```bash
+   docker compose -f docker-compose.prod.yml pull
+   docker compose -f docker-compose.prod.yml up -d
+   ```
+
+5. **Verify deployment:**
+   ```bash
+   docker ps
+   curl http://localhost:8000/api/health
+   ```
+
+For detailed instructions, see the comments in each example file.
+
 ## API Endpoints
 
 All endpoints are prefixed with `/api`.
@@ -342,6 +412,11 @@ The deck will automatically appear in the deck list after the backend reloads.
 │   ├── package.json
 │   └── Dockerfile
 ├── docker-compose.yml
+├── examples/          # Deployment configuration examples
+│   ├── docker-compose.prod.example.yml
+│   ├── env.example
+│   ├── nginx-container.conf.example
+│   └── nginx-server.conf.example
 └── README.md
 ```
 

@@ -1,0 +1,128 @@
+# ===============================
+# AI Flashcards — Nginx Container Configuration
+# ===============================
+#
+# This is the nginx configuration used INSIDE the frontend Docker container.
+# It is copied into the container during the production build process.
+#
+# Location in container: /etc/nginx/conf.d/default.conf
+#
+# -------------------------------
+# When to Use This File
+# -------------------------------
+# - This file is used by the production frontend Docker image
+# - It handles routing within the container (SPA routing, API proxying)
+# - For server-level nginx configuration (reverse proxy on host), see:
+#   examples/nginx-server.conf.example
+#
+# -------------------------------
+# Configuration Overview
+# -------------------------------
+# - Serves static files from /usr/share/nginx/html (built React app)
+# - Handles SPA routing (all routes serve index.html)
+# - Proxies /api/* requests to the backend container
+# - Enables gzip compression for better performance
+#
+# ===============================
+
+server {
+    # Listen on port 80 inside the container
+    # This port is exposed and mapped by Docker Compose
+    listen 80;
+    
+    # Server name (wildcard accepts any hostname)
+    # In production, the host-level nginx will handle domain routing
+    server_name _;
+    
+    # Root directory for static files
+    # This is where the built React app is located
+    root /usr/share/nginx/html;
+    
+    # Default file to serve for directory requests
+    index index.html;
+
+    # -------------------------------
+    # SPA Routing Configuration
+    # -------------------------------
+    # This location block handles all requests to the root path.
+    # The try_files directive ensures that:
+    # 1. First, try to serve the requested file ($uri)
+    # 2. If not found, try the file as a directory ($uri/)
+    # 3. If still not found, serve index.html (for client-side routing)
+    #
+    # This is essential for React Router to work correctly.
+    # Without this, refreshing a page like /decks/123 would return 404.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # -------------------------------
+    # API Proxy Configuration
+    # -------------------------------
+    # This location block proxies all /api/* requests to the backend container.
+    # The backend service name "backend" is resolved by Docker's internal DNS.
+    #
+    # Proxy headers are set to preserve:
+    # - Host: Original host header from client
+    # - X-Real-IP: Client's real IP address
+    # - X-Forwarded-For: Chain of proxy IPs
+    # - X-Forwarded-Proto: Original protocol (http/https)
+    #
+    # These headers are important for:
+    # - CORS handling in FastAPI
+    # - Security logging
+    # - Protocol-aware redirects
+    location /api/ {
+        # Backend container name (as defined in docker-compose.yml)
+        # Docker Compose creates a network where services can be reached by name
+        proxy_pass http://backend:8000;
+        
+        # Preserve original host header
+        proxy_set_header Host $host;
+        
+        # Preserve client's real IP address
+        proxy_set_header X-Real-IP $remote_addr;
+        
+        # Preserve forwarding chain for IP addresses
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        
+        # Preserve original protocol (http/https)
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # -------------------------------
+    # Gzip Compression
+    # -------------------------------
+    # Enables gzip compression to reduce bandwidth usage and improve load times.
+    # Only compresses files larger than 1024 bytes to avoid overhead on small files.
+    #
+    # Compression is applied to:
+    # - Text files (HTML, CSS, JavaScript, JSON, XML)
+    # - Application files (JavaScript, JSON)
+    #
+    # Binary files (images, fonts) are typically already compressed and excluded.
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;
+}
+
+# ===============================
+# Notes for Path-Based Routing
+# ===============================
+#
+# If deploying to a subdirectory (e.g., /flashcards/), you need to:
+#
+# 1. Update the frontend build to use the correct base path:
+#    - Set VITE_BASE_PATH=/flashcards/ during build
+#    - Set VITE_API_BASE=/flashcards/api during build
+#
+# 2. Modify this nginx config to handle the subdirectory:
+#    - Change root to: root /usr/share/nginx/html;
+#    - Update location blocks to include the base path
+#    - Example: location /flashcards/ { ... }
+#    - Example: location /flashcards/api/ { ... }
+#
+# 3. Update the server-level nginx to route /flashcards/* to this container
+#
+# See examples/nginx-server.conf.example for server-level configuration.
