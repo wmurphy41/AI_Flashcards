@@ -1,0 +1,60 @@
+{
+  "id": "chesapeake-bay-common-fish",
+  "title": "Chesapeake Bay Common Fish",
+  "description": "Ten most common fish in Chesapeake Bay with appearance and fishery rules.",
+  "source": "openai:gpt-4.1-mini",
+  "generated_at": "2026-02-14",
+  "cards": [
+    {
+      "id": "c1",
+      "front": "Striped Bass",
+      "back": "Silver with dark stripes, season Apr-Dec, min length 28 inches, daily limit 2."
+    },
+    {
+      "id": "c2",
+      "front": "Blue Crab",
+      "back": "Blue-tinted claws, season May-Dec, min size 5 inches, daily limit 12 crabs."
+    },
+    {
+      "id": "c3",
+      "front": "White Perch",
+      "back": "Silver body, spiny dorsal fin, no closed season, daily limit 30."
+    },
+    {
+      "id": "c4",
+      "front": "American Eel",
+      "back": "Long, snake-like with dark brown color, season May-Sep, daily limit 25."
+    },
+    {
+      "id": "c5",
+      "front": "Menhaden",
+      "back": "Silver scales, oily fish, no minimum size, commercial harvest regulated."
+    },
+    {
+      "id": "c6",
+      "front": "Channel Catfish",
+      "back": "Whiskered barbels, spotted body, no closed season, daily limit 20."
+    },
+    {
+      "id": "c7",
+      "front": "White Catfish",
+      "back": "Pale body, barbels around mouth, no closed season, daily limit 20."
+    },
+    {
+      "id": "c8",
+      "front": "American Shad",
+      "back": "Silver with greenish back, runs Apr-May, catch and release encouraged."
+    },
+    {
+      "id": "c9",
+      "front": "Atlantic Croaker",
+      "back": "Bronze color with dark spots, no closed season, daily limit 25."
+    },
+    {
+      "id": "c10",
+      "front": "Spot",
+      "back": "Silver with black spot on side, no closed season, daily limit 50."
+    }
+  ],
+  "prompt": "Create a deck of the ten most common fish found in the Chesapeake Bay and its estuaries.  On the front of each card, put the name of the fish.  On the back, put a brief description of it's appearance and related fishery rules for the species (e.g., Season, Minimum Keep Length, Daily Catch Limit)."
+}

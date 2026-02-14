@@ -13,6 +13,7 @@ class Deck(BaseModel):
     id: str = Field(..., description="Unique deck ID (must match filename stem)")
     title: str = Field(..., description="Deck title")
     description: Optional[str] = Field(None, description="Deck description")
+    prompt: Optional[str] = Field(None, description="User prompt/description used to generate this deck")
     cards: list[Card] = Field(..., description="List of cards in the deck")
 
 

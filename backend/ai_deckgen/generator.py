@@ -135,6 +135,7 @@ class DeckGenerator:
         # Inject metadata (override any values from LLM)
         deck_data['source'] = f"openai:{self.MODEL_NAME}"
         deck_data['generated_at'] = date.today().isoformat()
+        deck_data['prompt'] = description
         
         # Validate and repair
         normalized, warnings, errors = self.validator.validate_and_repair(deck_data)
