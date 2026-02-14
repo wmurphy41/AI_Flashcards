@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 import json
 import sys
+import tempfile
+import os
 from pathlib import Path
 
 from .content_loader import list_decks, get_deck, resolve_deck_file_path
@@ -31,6 +34,13 @@ app.add_middleware(
 class DeckGenerationRequest(BaseModel):
     """Request model for deck generation."""
     description: str = ""
+
+
+class DeckUpdateRequest(BaseModel):
+    """Request model for deck updates."""
+    title: str
+    description: Optional[str] = None
+    prompt: Optional[str] = None
 
 
 @app.get("/api/health")
@@ -96,6 +106,92 @@ async def delete_deck(deck_id: str):
     
     # Return 204 No Content on success
     return Response(status_code=204)
+
+
+@app.put("/api/decks/{deck_id}", response_model=Deck)
+async def update_deck(deck_id: str, request: DeckUpdateRequest):
+    """
+    Update deck attributes (title, description, prompt).
+    
+    Preserves all other fields (id, cards, source, generated_at, etc.).
+    """
+    try:
+        # Resolve the deck file path
+        deck_file = resolve_deck_file_path(deck_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    
+    # Read existing deck JSON
+    try:
+        with open(deck_file, "r", encoding="utf-8") as f:
+            deck_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to read deck file: {str(e)}"
+        )
+    
+    # Validate title is not empty
+    if not request.title or not request.title.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Title cannot be empty"
+        )
+    
+    # Update only the provided fields
+    deck_data['title'] = request.title.strip()
+    
+    if request.description is not None:
+        deck_data['description'] = request.description.strip() if request.description else None
+    else:
+        # Preserve existing description if not provided
+        pass
+    
+    if request.prompt is not None:
+        deck_data['prompt'] = request.prompt.strip() if request.prompt else None
+    else:
+        # Preserve existing prompt if not provided
+        pass
+    
+    # Write updated deck back to file using atomic write
+    try:
+        # Create temp file in the same directory
+        temp_fd, temp_path = tempfile.mkstemp(
+            suffix='.json',
+            dir=deck_file.parent,
+            prefix='.deck-',
+            text=True
+        )
+        
+        try:
+            # Write JSON to temp file
+            with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
+                json.dump(deck_data, f, indent=2, ensure_ascii=False)
+            
+            # Atomic rename
+            os.replace(temp_path, deck_file)
+        except Exception:
+            # Clean up temp file on error
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+            raise
+    except OSError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to write deck file: {str(e)}"
+        )
+    
+    # Return updated deck (load it back to ensure consistency)
+    try:
+        return get_deck(deck_id)
+    except FileNotFoundError:
+        # This shouldn't happen, but handle it gracefully
+        raise HTTPException(
+            status_code=500,
+            detail="Deck updated but failed to reload"
+        )
 
 
 @app.post("/api/ai/decks")

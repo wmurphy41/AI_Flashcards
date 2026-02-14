@@ -9,6 +9,7 @@ interface ManageDecksProps {
   error: string | null
   onBack: () => void
   onRefresh: () => void
+  onEdit: (deckId: string) => void
 }
 
 // Helper function to check if a deck is a system deck
@@ -16,7 +17,7 @@ export function isSystemDeck(deck: DeckSummary & { source?: string }): boolean {
   return deck.source === 'system'
 }
 
-export function ManageDecks({ decks, loading, error, onBack, onRefresh }: ManageDecksProps) {
+export function ManageDecks({ decks, loading, error, onBack, onRefresh, onEdit }: ManageDecksProps) {
   const [swipedIndex, setSwipedIndex] = useState<number | null>(null)
   const [deleteConfirmDeck, setDeleteConfirmDeck] = useState<DeckSummary | null>(null)
   const [systemDeckWarning, setSystemDeckWarning] = useState(false)
@@ -127,7 +128,10 @@ export function ManageDecks({ decks, loading, error, onBack, onRefresh }: Manage
         )}
         {!loading && !error && (
           <>
-            <p className="manage-decks-helper">Swipe left to delete a deck</p>
+            <p className="manage-decks-helper">
+              Swipe left to delete a deck<br />
+              Click on deck to edit
+            </p>
             <div className="deck-list">
               {decks.length === 0 ? (
                 <p>No decks available</p>
@@ -146,6 +150,13 @@ export function ManageDecks({ decks, loading, error, onBack, onRefresh }: Manage
                       <div
                         className={`deck-item ${systemDeck ? 'deck-item-system' : ''}`}
                         style={{ transform: isSwiped ? 'translateX(-80px)' : 'translateX(0)' }}
+                        onClick={(e) => {
+                          // Only allow click when not swiped
+                          if (!isSwiped) {
+                            e.stopPropagation()
+                            onEdit(deck.id)
+                          }
+                        }}
                       >
                         <h3 className="deck-title">{deck.title}</h3>
                         {deck.description && (

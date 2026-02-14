@@ -6,6 +6,7 @@ import { DetailedResults } from './components/DetailedResults'
 import { ConfirmDialog } from './components/ConfirmDialog'
 import { CreateDeck } from './components/CreateDeck'
 import { ManageDecks } from './components/ManageDecks'
+import { EditDeck } from './components/EditDeck'
 import {
   initSession,
   applyAnswer,
@@ -16,7 +17,7 @@ import {
 import { computeScores, computeBreakdown } from './sessionStats'
 import './App.css'
 
-type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'create-deck' | 'manage-decks'
+type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'create-deck' | 'manage-decks' | 'edit-deck'
 
 function App() {
   const [view, setView] = useState<View>('list')
@@ -126,7 +127,7 @@ function App() {
       setView('detail')
       setSessionState(null)
       setSessionOptions(null)
-    } else if (view === 'create-deck' || view === 'manage-decks') {
+    } else if (view === 'create-deck' || view === 'manage-decks' || view === 'edit-deck') {
       setView('list')
     }
   }
@@ -137,6 +138,28 @@ function App() {
 
   const handleManageDecks = () => {
     setView('manage-decks')
+  }
+
+  const handleEditDeck = (deckId: string) => {
+    setSelectedDeckId(deckId)
+    setView('edit-deck')
+  }
+
+  const handleEditDeckSuccess = async () => {
+    // Refresh deck list
+    try {
+      await refreshDeckList()
+    } catch (err) {
+      console.error('Failed to refresh deck list after edit:', err)
+    }
+    // Navigate back to manage-decks
+    setView('manage-decks')
+    setSelectedDeckId(null)
+    // Show success toast
+    setToast({ message: 'Deck updated successfully' })
+    setTimeout(() => {
+      setToast(null)
+    }, 3000)
   }
 
   const handleCreateDeckSuccess = async (deck: Deck, truncated?: boolean) => {
@@ -356,6 +379,17 @@ function App() {
         error={error}
         onBack={handleBack}
         onRefresh={refreshDeckList}
+        onEdit={handleEditDeck}
+      />
+    )
+  }
+
+  if (view === 'edit-deck' && selectedDeckId) {
+    return (
+      <EditDeck
+        deckId={selectedDeckId}
+        onSave={handleEditDeckSuccess}
+        onCancel={handleBack}
       />
     )
   }
@@ -488,7 +522,7 @@ function App() {
                 {selectedDeck.cards.length} card{selectedDeck.cards.length !== 1 ? 's' : ''}
               </p>
               <div className="preview-section">
-                <h3>Preview</h3>
+                <h3>Preview Deck</h3>
                 <ul className="card-preview-list">
                   {selectedDeck.cards.slice(0, 3).map((card) => (
                     <li key={card.uid} className="card-preview-item">
@@ -542,7 +576,7 @@ function App() {
                 </button>
                 <button className="study-button manage-decks-button" onClick={handleManageDecks}>
                   Manage Decks
-                </button>
+        </button>
               </div>
               <div className="deck-list">
                 {decks.length === 0 ? (

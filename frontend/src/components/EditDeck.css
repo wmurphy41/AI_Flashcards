@@ -1,0 +1,133 @@
+.edit-deck-container {
+  width: 100%;
+}
+
+.edit-field {
+  margin-bottom: 1.5rem;
+}
+
+.edit-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.edit-input,
+.edit-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #fff;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.edit-input:focus,
+.edit-textarea:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.edit-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.edit-save-button,
+.edit-cancel-button {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  min-height: 48px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  touch-action: manipulation;
+}
+
+.edit-save-button {
+  background-color: #646cff;
+  color: white;
+}
+
+.edit-save-button:hover:not(:disabled) {
+  background-color: #535bf2;
+}
+
+.edit-save-button:active:not(:disabled) {
+  background-color: #4c54e0;
+}
+
+.edit-save-button:disabled {
+  background-color: #4a5568;
+  color: #888;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.edit-cancel-button {
+  background-color: #4a5568;
+  color: white;
+}
+
+.edit-cancel-button:hover:not(:disabled) {
+  background-color: #3a4157;
+}
+
+.edit-cancel-button:active:not(:disabled) {
+  background-color: #2d3448;
+}
+
+.edit-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Light mode support */
+@media (prefers-color-scheme: light) {
+  .edit-field label {
+    color: #1a1a1a;
+  }
+
+  .edit-input,
+  .edit-textarea {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    color: #1a1a1a;
+  }
+
+  .edit-input:focus,
+  .edit-textarea:focus {
+    border-color: #646cff;
+  }
+
+  .edit-save-button:disabled {
+    background-color: #e0e0e0;
+    color: #888;
+  }
+
+  .edit-cancel-button {
+    background-color: #e0e0e0;
+    color: #1a1a1a;
+  }
+
+  .edit-cancel-button:hover:not(:disabled) {
+    background-color: #d0d0d0;
+  }
+
+  .edit-cancel-button:active:not(:disabled) {
+    background-color: #c0c0c0;
+  }
+}

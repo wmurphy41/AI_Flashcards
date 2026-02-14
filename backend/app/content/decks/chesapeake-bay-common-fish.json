@@ -1,7 +1,7 @@
 {
   "id": "chesapeake-bay-common-fish",
   "title": "Chesapeake Bay Common Fish",
-  "description": "Ten most common fish in Chesapeake Bay with appearance and fishery rules.",
+  "description": "Five most common fish in Chesapeake Bay with appearance and fishery rules.",
   "source": "openai:gpt-4.1-mini",
   "generated_at": "2026-02-14",
   "cards": [
@@ -56,5 +56,5 @@
       "back": "Silver with black spot on side, no closed season, daily limit 50."
     }
   ],
-  "prompt": "Create a deck of the ten most common fish found in the Chesapeake Bay and its estuaries.  On the front of each card, put the name of the fish.  On the back, put a brief description of it's appearance and related fishery rules for the species (e.g., Season, Minimum Keep Length, Daily Catch Limit)."
+  "prompt": "Create a deck of the five most common fish found in the Chesapeake Bay and its estuaries. Include only fish, no shellfish.  On the front of each card, put the name of the fish.  On the back, put a brief description of it's appearance and related fishery rules for the species (e.g., Season, Minimum Keep Length, Daily Catch Limit)."
 }

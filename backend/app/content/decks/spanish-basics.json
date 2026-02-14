@@ -1,15 +1,34 @@
 {
   "id": "spanish-basics",
-  "title": "Spanish Basics",
+  "title": "Spanish Basic Vocab Words",
   "description": "Common greetings and phrases with Spanish on the front and English on the back.",
-  "source":"manual",
-  "generated_at":"2025-12-28",
+  "source": "manual",
+  "generated_at": "2025-12-28",
   "cards": [
-    { "id": "c1", "front": "hola", "back": "hello" },
-    { "id": "c2", "front": "adiós", "back": "goodbye" },
-    { "id": "c3", "front": "por favor", "back": "please" },
-    { "id": "c4", "front": "gracias", "back": "thank you" },
-    { "id": "c5", "front": "buenos días", "back": "good morning" }
+    {
+      "id": "c1",
+      "front": "hola",
+      "back": "hello"
+    },
+    {
+      "id": "c2",
+      "front": "adiós",
+      "back": "goodbye"
+    },
+    {
+      "id": "c3",
+      "front": "por favor",
+      "back": "please"
+    },
+    {
+      "id": "c4",
+      "front": "gracias",
+      "back": "thank you"
+    },
+    {
+      "id": "c5",
+      "front": "buenos días",
+      "back": "good morning"
+    }
   ]
 }
-

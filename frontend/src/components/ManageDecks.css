@@ -4,6 +4,7 @@
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
   padding: 0.5rem;
+  line-height: 1.5;
 }
 
 .deck-item-container {
@@ -24,6 +25,7 @@
   justify-content: space-between;
   position: relative;
   z-index: 1;
+  cursor: pointer;
 }
 
 .deck-item-system {

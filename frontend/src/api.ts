@@ -17,6 +17,7 @@ type Deck = {
   id: string;
   title: string;
   description?: string;
+  prompt?: string;
   cards: Card[];
 };
 
@@ -28,6 +29,12 @@ type GenerateDeckResponse = {
   deck: Deck;
   path: string;
   truncated: boolean;
+};
+
+type DeckUpdateRequest = {
+  title: string;
+  description?: string;
+  prompt?: string;
 };
 
 type ApiError = {
@@ -104,5 +111,26 @@ export async function deleteDeck(deckId: string): Promise<void> {
   }
 }
 
+export async function updateDeck(id: string, updates: DeckUpdateRequest): Promise<Deck> {
+  const response = await fetch(apiUrl(`decks/${id}`), {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updates),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    const apiError = errorData as ApiError;
+    const error = new Error(apiError.detail || apiError.error || `Failed to update deck: ${response.statusText}`);
+    (error as any).status = response.status;
+    (error as any).details = apiError.details || [];
+    throw error;
+  }
+
+  return response.json();
+}
+
 // Export types for use in other files
-export type { Card, DeckSummary, Deck, GenerateDeckResponse, ApiError };
+export type { Card, DeckSummary, Deck, GenerateDeckResponse, DeckUpdateRequest, ApiError };
