@@ -128,8 +128,11 @@ function App() {
       setView('detail')
       setSessionState(null)
       setSessionOptions(null)
-    } else if (view === 'create-deck' || view === 'manage-decks' || view === 'edit-deck' || view === 'edit-cards') {
+    } else if (view === 'create-deck' || view === 'edit-deck' || view === 'edit-cards') {
       setView('manage-decks')
+      setSelectedDeckId(null)
+    } else if (view === 'manage-decks') {
+      setView('list')
       setSelectedDeckId(null)
     }
   }
