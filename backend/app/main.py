@@ -48,6 +48,12 @@ class DeckOrderRequest(BaseModel):
     deck_ids: list[str]
 
 
+class CardUpdateRequest(BaseModel):
+    """Request model for card updates."""
+    front: str
+    back: str
+
+
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
@@ -311,6 +317,196 @@ async def update_deck(deck_id: str, request: DeckUpdateRequest):
         raise HTTPException(
             status_code=500,
             detail="Deck updated but failed to reload"
+        )
+
+
+@app.put("/api/decks/{deck_id}/cards/{card_id}", response_model=Deck)
+async def update_card(deck_id: str, card_id: str, request: CardUpdateRequest):
+    """
+    Update a specific card's front and back text.
+    
+    Args:
+        deck_id: The deck ID
+        card_id: The card ID
+        request: Request containing updated front and back text
+        
+    Returns:
+        Updated deck
+    """
+    # Validate front and back are not empty
+    if not request.front or not request.front.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Front text cannot be empty"
+        )
+    if not request.back or not request.back.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Back text cannot be empty"
+        )
+    
+    try:
+        # Resolve the deck file path
+        deck_file = resolve_deck_file_path(deck_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    
+    # Read existing deck JSON
+    try:
+        with open(deck_file, "r", encoding="utf-8") as f:
+            deck_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to read deck file: {str(e)}"
+        )
+    
+    # Find the card by card_id
+    cards = deck_data.get('cards', [])
+    card_found = False
+    for card in cards:
+        if card.get('id') == card_id:
+            # Update the card
+            card['front'] = request.front.strip()
+            card['back'] = request.back.strip()
+            card_found = True
+            break
+    
+    if not card_found:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Card '{card_id}' not found in deck"
+        )
+    
+    # Write updated deck back to file using atomic write
+    try:
+        # Create temp file in the same directory
+        temp_fd, temp_path = tempfile.mkstemp(
+            suffix='.json',
+            dir=deck_file.parent,
+            prefix='.deck-',
+            text=True
+        )
+        
+        try:
+            # Write JSON to temp file
+            with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
+                json.dump(deck_data, f, indent=2, ensure_ascii=False)
+            
+            # Atomic rename
+            os.replace(temp_path, deck_file)
+        except Exception:
+            # Clean up temp file on error
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+            raise
+    except OSError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to write deck file: {str(e)}"
+        )
+    
+    # Return updated deck (load it back to ensure consistency)
+    try:
+        return get_deck(deck_id)
+    except FileNotFoundError:
+        # This shouldn't happen, but handle it gracefully
+        raise HTTPException(
+            status_code=500,
+            detail="Card updated but failed to reload deck"
+        )
+
+
+@app.delete("/api/decks/{deck_id}/cards/{card_id}", response_model=Deck)
+async def delete_card(deck_id: str, card_id: str):
+    """
+    Delete a specific card from a deck.
+    
+    Prevents deletion if it's the last card in the deck.
+    
+    Args:
+        deck_id: The deck ID
+        card_id: The card ID
+        
+    Returns:
+        Updated deck
+    """
+    try:
+        # Resolve the deck file path
+        deck_file = resolve_deck_file_path(deck_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Deck not found")
+    
+    # Read existing deck JSON
+    try:
+        with open(deck_file, "r", encoding="utf-8") as f:
+            deck_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to read deck file: {str(e)}"
+        )
+    
+    cards = deck_data.get('cards', [])
+    
+    # Prevent deletion if it's the last card
+    if len(cards) <= 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot delete the last card in a deck"
+        )
+    
+    # Find and remove the card by card_id
+    original_length = len(cards)
+    deck_data['cards'] = [card for card in cards if card.get('id') != card_id]
+    
+    if len(deck_data['cards']) == original_length:
+        # Card not found
+        raise HTTPException(
+            status_code=404,
+            detail=f"Card '{card_id}' not found in deck"
+        )
+    
+    # Write updated deck back to file using atomic write
+    try:
+        # Create temp file in the same directory
+        temp_fd, temp_path = tempfile.mkstemp(
+            suffix='.json',
+            dir=deck_file.parent,
+            prefix='.deck-',
+            text=True
+        )
+        
+        try:
+            # Write JSON to temp file
+            with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
+                json.dump(deck_data, f, indent=2, ensure_ascii=False)
+            
+            # Atomic rename
+            os.replace(temp_path, deck_file)
+        except Exception:
+            # Clean up temp file on error
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+            raise
+    except OSError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to write deck file: {str(e)}"
+        )
+    
+    # Return updated deck (load it back to ensure consistency)
+    try:
+        return get_deck(deck_id)
+    except FileNotFoundError:
+        # This shouldn't happen, but handle it gracefully
+        raise HTTPException(
+            status_code=500,
+            detail="Card deleted but failed to reload deck"
         )
 
 

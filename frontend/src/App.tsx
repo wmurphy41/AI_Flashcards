@@ -7,6 +7,7 @@ import { ConfirmDialog } from './components/ConfirmDialog'
 import { CreateDeck } from './components/CreateDeck'
 import { ManageDecks } from './components/ManageDecks'
 import { EditDeck } from './components/EditDeck'
+import { EditCards } from './components/EditCards'
 import {
   initSession,
   applyAnswer,
@@ -17,7 +18,7 @@ import {
 import { computeScores, computeBreakdown } from './sessionStats'
 import './App.css'
 
-type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'create-deck' | 'manage-decks' | 'edit-deck'
+type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'create-deck' | 'manage-decks' | 'edit-deck' | 'edit-cards'
 
 function App() {
   const [view, setView] = useState<View>('list')
@@ -25,7 +26,7 @@ function App() {
   const [decks, setDecks] = useState<DeckSummary[]>([])
   const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null)
   const [sessionState, setSessionState] = useState<SessionState | null>(null)
-  const [sessionOptions, setSessionOptions] = useState<{ startSide: 'front' | 'back'; maxCycles: number } | null>(null)
+  const [sessionOptions, setSessionOptions] = useState<{ startSide: 'front' | 'back'; maxCycles: number; cardOrder: 'original' | 'random' } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showEndSessionConfirm, setShowEndSessionConfirm] = useState(false)
@@ -127,8 +128,9 @@ function App() {
       setView('detail')
       setSessionState(null)
       setSessionOptions(null)
-    } else if (view === 'create-deck' || view === 'manage-decks' || view === 'edit-deck') {
-      setView('list')
+    } else if (view === 'create-deck' || view === 'manage-decks' || view === 'edit-deck' || view === 'edit-cards') {
+      setView('manage-decks')
+      setSelectedDeckId(null)
     }
   }
 
@@ -161,6 +163,12 @@ function App() {
       setToast(null)
     }, 3000)
   }
+
+  const handleEditCards = (deckId: string) => {
+    setSelectedDeckId(deckId)
+    setView('edit-cards')
+  }
+
 
   const handleCreateDeckSuccess = async (deck: Deck, truncated?: boolean) => {
     // Show toast
@@ -215,10 +223,10 @@ function App() {
     }
   }
 
-  const handleSetupStart = (options: { startSide: 'front' | 'back'; maxCycles: number }) => {
+  const handleSetupStart = (options: { startSide: 'front' | 'back'; maxCycles: number; cardOrder: 'original' | 'random' }) => {
     if (selectedDeck) {
       setSessionOptions(options)
-      const session = initSession(selectedDeck.cards, options.maxCycles)
+      const session = initSession(selectedDeck.cards, options.maxCycles, options.cardOrder)
       setSessionState(session)
       setView('study')
     }
@@ -242,7 +250,8 @@ function App() {
       setSessionState(newState)
       setView('results')
     } else if (shouldAdvance) {
-      const nextCycleState = startNextCycle(newState, selectedDeck.cards)
+      const cardOrder = sessionOptions?.cardOrder || 'original'
+      const nextCycleState = startNextCycle(newState, selectedDeck.cards, cardOrder)
       setSessionState(nextCycleState)
     } else {
       setSessionState(newState)
@@ -390,6 +399,16 @@ function App() {
         deckId={selectedDeckId}
         onSave={handleEditDeckSuccess}
         onCancel={handleBack}
+        onEditCards={handleEditCards}
+      />
+    )
+  }
+
+  if (view === 'edit-cards' && selectedDeckId) {
+    return (
+      <EditCards
+        deckId={selectedDeckId}
+        onBack={handleBack}
       />
     )
   }
@@ -578,6 +597,7 @@ function App() {
                   Manage Decks
         </button>
               </div>
+              <p className="deck-list-helper">Select any deck to get started</p>
               <div className="deck-list">
                 {decks.length === 0 ? (
                   <p>No decks available</p>

@@ -7,9 +7,10 @@ interface EditDeckProps {
   deckId: string
   onSave: () => void
   onCancel: () => void
+  onEditCards: (deckId: string) => void
 }
 
-export function EditDeck({ deckId, onSave, onCancel }: EditDeckProps) {
+export function EditDeck({ deckId, onSave, onCancel, onEditCards }: EditDeckProps) {
   const [deck, setDeck] = useState<Deck | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -227,6 +228,14 @@ export function EditDeck({ deckId, onSave, onCancel }: EditDeckProps) {
               )}
             </ul>
           </div>
+
+          <button
+            className="edit-cards-button"
+            onClick={() => onEditCards(deckId)}
+            style={{ marginTop: '1.5rem' }}
+          >
+            Edit Cards
+          </button>
 
           {error && (
             <div className="error-container">

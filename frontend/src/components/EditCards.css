@@ -1,0 +1,254 @@
+.edit-cards-header {
+  margin-bottom: 1.5rem;
+}
+
+.edit-cards-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.edit-cards-header .card-count {
+  margin: 0;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.edit-cards-helper {
+  margin: 0.5rem 0 0 0;
+  color: #888;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card-item-container {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.card-item {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.3s ease;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.card-item-front {
+  color: #fff;
+  font-size: 1rem;
+  word-wrap: break-word;
+}
+
+.card-item-back {
+  color: #aaa;
+  font-size: 0.95rem;
+  word-wrap: break-word;
+}
+
+.card-item-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  z-index: 0;
+  padding-right: 1rem;
+}
+
+.card-delete-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  font-size: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-delete-button:hover {
+  background-color: #c82333;
+}
+
+.card-delete-button:active {
+  background-color: #bd2130;
+}
+
+.card-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card-edit-form-container {
+  margin-bottom: 1rem;
+}
+
+.card-edit-form {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-edit-field label {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.card-edit-textarea {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 0.75rem;
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.card-edit-textarea:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.card-edit-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.card-edit-save-button {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.card-edit-save-button:hover:not(:disabled) {
+  background-color: #535bf2;
+}
+
+.card-edit-save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card-edit-cancel-button {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  background-color: #4a5568;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.card-edit-cancel-button:hover:not(:disabled) {
+  background-color: #3a4157;
+}
+
+.card-edit-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Light mode support */
+@media (prefers-color-scheme: light) {
+  .card-item {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+  }
+
+  .card-item-front {
+    color: #1a1a1a;
+  }
+
+  .card-item-back {
+    color: #666;
+  }
+
+  .card-delete-button {
+    background-color: #dc3545;
+  }
+
+  .card-delete-button:hover {
+    background-color: #c82333;
+  }
+
+  .card-delete-button:active {
+    background-color: #bd2130;
+  }
+
+  .card-edit-form {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+  }
+
+  .card-edit-field label {
+    color: #1a1a1a;
+  }
+
+  .card-edit-textarea {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #1a1a1a;
+  }
+
+  .card-edit-textarea:focus {
+    border-color: #646cff;
+  }
+
+  .edit-cards-header h2 {
+    color: #1a1a1a;
+  }
+}

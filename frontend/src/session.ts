@@ -14,45 +14,72 @@ export type SessionAction =
   | { type: 'NEXT_CYCLE' };
 
 /**
+ * Shuffle an array using Fisher-Yates algorithm.
+ * 
+ * @param array - Array to shuffle
+ * @returns New shuffled array (original array is not modified)
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+/**
  * Build the queue of cards for a cycle.
  * 
- * Cycle 1: Returns all cards in their original order from the deck.
+ * Cycle 1: Returns all cards in their original order from the deck (or shuffled if cardOrder is 'random').
  * Cycles 2+: Returns only cards that were marked incorrect, maintaining
- *            the same relative order as they appeared in the original deck.
+ *            the same relative order as they appeared in the original deck (or shuffled if cardOrder is 'random').
  * 
  * @param allCards - All cards from the deck in original order
  * @param incorrectCardIds - Set of card UIDs that were answered incorrectly
  * @param cycle - Current cycle number
+ * @param cardOrder - 'original' to preserve order, 'random' to shuffle
  * @returns Array of cards to study in this cycle
  */
 export function buildCycleQueue(
   allCards: Card[],
   incorrectCardIds: Set<string>,
-  cycle: number
+  cycle: number,
+  cardOrder: 'original' | 'random' = 'original'
 ): Card[] {
+  let cards: Card[];
+  
   if (cycle === 1) {
-    return [...allCards];
+    cards = [...allCards];
+  } else {
+    // For cycles 2+, return only incorrect cards
+    cards = allCards.filter(card => incorrectCardIds.has(card.uid));
   }
   
-  // For cycles 2+, return only incorrect cards in original order
-  return allCards.filter(card => incorrectCardIds.has(card.uid));
+  // Shuffle if random order is requested
+  if (cardOrder === 'random') {
+    return shuffleArray(cards);
+  }
+  
+  return cards;
 }
 
 /**
  * Initialize session state for a deck.
  * 
  * Creates a new study session starting at cycle 1 with all cards
- * in the original deck order.
+ * in the original deck order (or shuffled if cardOrder is 'random').
  * 
  * @param deckCards - Array of cards from the deck
  * @param maxCycles - Maximum number of cycles (default: 4)
+ * @param cardOrder - 'original' to preserve order, 'random' to shuffle (default: 'original')
  * @returns Initial session state
  */
-export function initSession(deckCards: Card[], maxCycles: number = 4): SessionState {
+export function initSession(deckCards: Card[], maxCycles: number = 4, cardOrder: 'original' | 'random' = 'original'): SessionState {
   return {
     cycle: 1,
     currentCardIndex: 0,
-    cycleQueue: buildCycleQueue(deckCards, new Set(), 1),
+    cycleQueue: buildCycleQueue(deckCards, new Set(), 1, cardOrder),
     incorrectCardIds: new Set(),
     cycle1Answers: new Map(),
     maxCycles,
@@ -149,11 +176,12 @@ export function shouldAdvanceCycle(state: SessionState, _allCards: Card[]): {
  * 
  * @param state - Current session state
  * @param allCards - All cards from the deck in original order
+ * @param cardOrder - 'original' to preserve order, 'random' to shuffle (default: 'original')
  * @returns Updated session state for the new cycle
  */
-export function startNextCycle(state: SessionState, allCards: Card[]): SessionState {
+export function startNextCycle(state: SessionState, allCards: Card[], cardOrder: 'original' | 'random' = 'original'): SessionState {
   const nextCycle = state.cycle + 1;
-  const nextQueue = buildCycleQueue(allCards, state.incorrectCardIds, nextCycle);
+  const nextQueue = buildCycleQueue(allCards, state.incorrectCardIds, nextCycle, cardOrder);
   
   return {
     ...state,

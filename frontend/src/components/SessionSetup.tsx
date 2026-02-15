@@ -4,17 +4,18 @@ import './SessionSetup.css';
 
 type SessionSetupProps = {
   deck: Deck;
-  onStart: (options: { startSide: 'front' | 'back'; maxCycles: number }) => void;
+  onStart: (options: { startSide: 'front' | 'back'; maxCycles: number; cardOrder: 'original' | 'random' }) => void;
   onCancel: () => void;
 };
 
 export function SessionSetup({ deck, onStart, onCancel }: SessionSetupProps) {
   const [startSide, setStartSide] = useState<'front' | 'back'>('front');
   const [maxCycles, setMaxCycles] = useState<number>(4);
+  const [cardOrder, setCardOrder] = useState<'original' | 'random'>('original');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onStart({ startSide, maxCycles });
+    onStart({ startSide, maxCycles, cardOrder });
   };
 
   return (
@@ -31,28 +32,38 @@ export function SessionSetup({ deck, onStart, onCancel }: SessionSetupProps) {
           
           <form onSubmit={handleSubmit} className="setup-form">
             <div className="setup-control">
-              <label htmlFor="start-side">Start Side</label>
-              <div className="radio-group">
-                <label className="radio-option">
-                  <input
-                    type="radio"
-                    name="start-side"
-                    value="front"
-                    checked={startSide === 'front'}
-                    onChange={() => setStartSide('front')}
-                  />
-                  <span>Front</span>
-                </label>
-                <label className="radio-option">
-                  <input
-                    type="radio"
-                    name="start-side"
-                    value="back"
-                    checked={startSide === 'back'}
-                    onChange={() => setStartSide('back')}
-                  />
-                  <span>Back</span>
-                </label>
+              <div className="toggle-row">
+                <label htmlFor="start-side">Start Side:</label>
+                <div className="toggle-container">
+                  <span className={`toggle-label ${startSide === 'front' ? 'active' : ''}`}>Front</span>
+                  <button
+                    type="button"
+                    className={`toggle-switch ${startSide === 'back' ? 'active' : ''}`}
+                    onClick={() => setStartSide(startSide === 'front' ? 'back' : 'front')}
+                    aria-label={`Start side: ${startSide}`}
+                  >
+                    <span className="toggle-slider"></span>
+                  </button>
+                  <span className={`toggle-label ${startSide === 'back' ? 'active' : ''}`}>Back</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="setup-control">
+              <div className="toggle-row">
+                <label htmlFor="card-order">Card Order:</label>
+                <div className="toggle-container">
+                  <span className={`toggle-label ${cardOrder === 'original' ? 'active' : ''}`}>Original</span>
+                  <button
+                    type="button"
+                    className={`toggle-switch ${cardOrder === 'random' ? 'active' : ''}`}
+                    onClick={() => setCardOrder(cardOrder === 'original' ? 'random' : 'original')}
+                    aria-label={`Card order: ${cardOrder}`}
+                  >
+                    <span className="toggle-slider"></span>
+                  </button>
+                  <span className={`toggle-label ${cardOrder === 'random' ? 'active' : ''}`}>Random</span>
+                </div>
               </div>
             </div>
 
