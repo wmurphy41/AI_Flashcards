@@ -17,7 +17,7 @@ backend_dir = Path(__file__).parent.parent.resolve()
 if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
-from ai_deckgen.service import create_deck
+from ai_deckgen.service import create_deck, regenerate_deck_cards
 
 app = FastAPI()
 
@@ -138,7 +138,11 @@ async def update_deck(deck_id: str, request: DeckUpdateRequest):
             detail="Title cannot be empty"
         )
     
-    # Update only the provided fields
+    # Store original values for rollback if regeneration fails
+    original_prompt = deck_data.get('prompt')
+    original_cards = deck_data.get('cards', []).copy()
+    
+    # Update title and description first
     deck_data['title'] = request.title.strip()
     
     if request.description is not None:
@@ -147,8 +151,73 @@ async def update_deck(deck_id: str, request: DeckUpdateRequest):
         # Preserve existing description if not provided
         pass
     
+    # Check if prompt was edited
+    prompt_edited = False
     if request.prompt is not None:
-        deck_data['prompt'] = request.prompt.strip() if request.prompt else None
+        new_prompt = request.prompt.strip() if request.prompt else None
+        original_prompt_str = (original_prompt or '').strip()
+        new_prompt_str = (new_prompt or '').strip()
+        prompt_edited = new_prompt_str != original_prompt_str
+        
+        if prompt_edited:
+            # Regenerate cards using new prompt
+            try:
+                # Truncate prompt to 2000 chars (same limit as generation endpoint)
+                truncated_prompt = new_prompt_str[:2000] if new_prompt_str else ""
+                
+                # Regenerate cards while preserving deck metadata
+                regenerated_deck = regenerate_deck_cards(deck_data, truncated_prompt)
+                
+                # Update deck_data with new cards and prompt
+                deck_data['cards'] = regenerated_deck['cards']
+                deck_data['prompt'] = truncated_prompt
+                
+            except ValueError as e:
+                # Validation errors - restore original cards and prompt
+                deck_data['cards'] = original_cards
+                deck_data['prompt'] = original_prompt
+                error_msg = str(e)
+                if "Validation failed" in error_msg:
+                    details = []
+                    if "\n" in error_msg:
+                        details = [line.strip() for line in error_msg.split("\n") if line.strip() and line.strip().startswith("-")]
+                    raise HTTPException(
+                        status_code=400,
+                        detail={
+                            "error": "Card regeneration failed: Validation error",
+                            "details": details if details else [error_msg]
+                        }
+                    )
+                raise HTTPException(status_code=400, detail={"error": f"Card regeneration failed: {error_msg}"})
+                
+            except (RuntimeError, json.JSONDecodeError) as e:
+                # OpenAI API errors or JSON parsing errors - restore original cards and prompt
+                deck_data['cards'] = original_cards
+                deck_data['prompt'] = original_prompt
+                error_msg = str(e)
+                status_code = 502 if "OpenAI API" in error_msg or "API error" in error_msg else 502
+                raise HTTPException(
+                    status_code=status_code,
+                    detail={
+                        "error": f"Card regeneration failed: {error_msg}",
+                        "details": []
+                    }
+                )
+                
+            except Exception as e:
+                # Unexpected errors - restore original cards and prompt
+                deck_data['cards'] = original_cards
+                deck_data['prompt'] = original_prompt
+                raise HTTPException(
+                    status_code=500,
+                    detail={
+                        "error": f"Unexpected error during card regeneration: {str(e)}",
+                        "details": []
+                    }
+                )
+        else:
+            # Prompt not changed, just update it normally
+            deck_data['prompt'] = new_prompt
     else:
         # Preserve existing prompt if not provided
         pass

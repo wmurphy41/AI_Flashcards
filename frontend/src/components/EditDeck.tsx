@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getDeck, updateDeck, type Deck } from '../api'
+import { ConfirmDialog } from './ConfirmDialog'
 import './EditDeck.css'
 
 interface EditDeckProps {
@@ -13,6 +14,8 @@ export function EditDeck({ deckId, onSave, onCancel }: EditDeckProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false)
+  const [isRegenerating, setIsRegenerating] = useState(false)
   
   // Editable values
   const [title, setTitle] = useState('')
@@ -63,8 +66,19 @@ export function EditDeck({ deckId, onSave, onCancel }: EditDeckProps) {
   const handleSave = async () => {
     if (!hasChanges || !deck) return
 
+    // If prompt was edited, show confirmation first
+    if (promptEdited && !showRegenerateConfirm) {
+      setShowRegenerateConfirm(true)
+      return
+    }
+
+    // Proceed with save (either no prompt edit, or user confirmed)
     setSaving(true)
     setError(null)
+    
+    if (promptEdited) {
+      setIsRegenerating(true)
+    }
 
     try {
       await updateDeck(deckId, {
@@ -76,7 +90,17 @@ export function EditDeck({ deckId, onSave, onCancel }: EditDeckProps) {
     } catch (err: any) {
       setError(err.message || 'Failed to update deck')
       setSaving(false)
+      setIsRegenerating(false)
     }
+  }
+
+  const handleRegenerateConfirm = () => {
+    setShowRegenerateConfirm(false)
+    handleSave()
+  }
+
+  const handleRegenerateCancel = () => {
+    setShowRegenerateConfirm(false)
   }
 
   const handleCancel = () => {
@@ -161,18 +185,24 @@ export function EditDeck({ deckId, onSave, onCancel }: EditDeckProps) {
             </div>
           )}
 
+          {isRegenerating && (
+            <div className="loading" style={{ marginBottom: '1rem', textAlign: 'center' }}>
+              Regenerating cards...
+            </div>
+          )}
+
           <div className="edit-buttons">
             <button
               className="edit-save-button"
               onClick={handleSave}
-              disabled={!hasChanges || saving}
+              disabled={!hasChanges || saving || isRegenerating}
             >
               {promptEdited ? 'Save and Regenerate' : 'Save'}
             </button>
             <button
               className="edit-cancel-button"
               onClick={handleCancel}
-              disabled={saving}
+              disabled={saving || isRegenerating}
             >
               Cancel
             </button>
@@ -205,6 +235,17 @@ export function EditDeck({ deckId, onSave, onCancel }: EditDeckProps) {
           )}
         </div>
       </div>
+
+      {showRegenerateConfirm && (
+        <ConfirmDialog
+          title="Regenerate Cards?"
+          message="This will replace all cards with new ones generated from the updated prompt. This action cannot be undone."
+          onConfirm={handleRegenerateConfirm}
+          onCancel={handleRegenerateCancel}
+          confirmLabel="Regenerate"
+          cancelLabel="Cancel"
+        />
+      )}
     </div>
   )
 }

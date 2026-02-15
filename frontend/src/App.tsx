@@ -155,7 +155,7 @@ function App() {
     // Navigate back to manage-decks
     setView('manage-decks')
     setSelectedDeckId(null)
-    // Show success toast
+    // Show success toast (message will be generic since we don't know if regeneration occurred)
     setToast({ message: 'Deck updated successfully' })
     setTimeout(() => {
       setToast(null)
