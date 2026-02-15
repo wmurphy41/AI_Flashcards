@@ -52,6 +52,22 @@ const apiUrl = (path: string): string => {
   return `${base}/${cleanPath}`;
 };
 
+// Helper function to safely extract error message from ApiError
+const getErrorMessage = (apiError: ApiError, defaultMessage: string): string => {
+  if (apiError.detail) {
+    if (typeof apiError.detail === 'string') return apiError.detail;
+    if (typeof apiError.detail === 'object') {
+      const detailObj = apiError.detail as any;
+      return detailObj.message || detailObj.error || JSON.stringify(detailObj);
+    }
+  }
+  if (apiError.error) {
+    if (typeof apiError.error === 'string') return apiError.error;
+    if (typeof apiError.error === 'object') return JSON.stringify(apiError.error);
+  }
+  return defaultMessage;
+};
+
 export async function getDecks(): Promise<DeckSummary[]> {
   const response = await fetch(apiUrl('decks'));
   if (!response.ok) {
@@ -83,7 +99,7 @@ export async function generateDeck(req: GenerateDeckRequest): Promise<GenerateDe
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
     const apiError = errorData as ApiError;
-    const error = new Error(apiError.error || `Failed to generate deck: ${response.statusText}`);
+    const error = new Error(getErrorMessage(apiError, `Failed to generate deck: ${response.statusText}`));
     (error as any).details = apiError.details || [];
     throw error;
   }
@@ -99,7 +115,7 @@ export async function deleteDeck(deckId: string): Promise<void> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
     const apiError = errorData as ApiError;
-    const error = new Error(apiError.detail || apiError.error || `Failed to delete deck: ${response.statusText}`);
+    const error = new Error(getErrorMessage(apiError, `Failed to delete deck: ${response.statusText}`));
     (error as any).status = response.status;
     (error as any).details = apiError.details || [];
     throw error;
@@ -123,7 +139,7 @@ export async function updateDeck(id: string, updates: DeckUpdateRequest): Promis
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
     const apiError = errorData as ApiError;
-    const error = new Error(apiError.detail || apiError.error || `Failed to update deck: ${response.statusText}`);
+    const error = new Error(getErrorMessage(apiError, `Failed to update deck: ${response.statusText}`));
     (error as any).status = response.status;
     (error as any).details = apiError.details || [];
     throw error;
@@ -178,7 +194,7 @@ export async function updateCard(deckId: string, cardId: string, updates: { fron
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
     const apiError = errorData as ApiError;
-    const error = new Error(apiError.detail || apiError.error || `Failed to update card: ${response.statusText}`);
+    const error = new Error(getErrorMessage(apiError, `Failed to update card: ${response.statusText}`));
     (error as any).status = response.status;
     (error as any).details = apiError.details || [];
     throw error;
@@ -195,7 +211,7 @@ export async function deleteCard(deckId: string, cardId: string): Promise<Deck> 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ error: response.statusText }));
     const apiError = errorData as ApiError;
-    const error = new Error(apiError.detail || apiError.error || `Failed to delete card: ${response.statusText}`);
+    const error = new Error(getErrorMessage(apiError, `Failed to delete card: ${response.statusText}`));
     (error as any).status = response.status;
     (error as any).details = apiError.details || [];
     throw error;
