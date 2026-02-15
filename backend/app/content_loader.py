@@ -1,7 +1,9 @@
 import json
 import re
+import tempfile
+import os
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 from .schemas import Deck, DeckSummary, Card
 
 
@@ -32,6 +34,74 @@ def _get_decks_directory() -> Path:
     package_dir = Path(__file__).parent
     decks_dir = package_dir / "content" / "decks"
     return decks_dir
+
+
+def _get_deck_order_file() -> Path:
+    """Get the path to the deck order configuration file."""
+    package_dir = Path(__file__).parent
+    return package_dir / "content" / "deck_order.json"
+
+
+def load_deck_order() -> Dict[str, int]:
+    """
+    Load deck order from configuration file.
+    
+    Returns:
+        Dictionary mapping deck_id -> order (0-based index)
+        Returns empty dict if file doesn't exist or is invalid
+    """
+    order_file = _get_deck_order_file()
+    
+    if not order_file.exists():
+        return {}
+    
+    try:
+        with open(order_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            # Extract order dict from JSON structure
+            return data.get("order", {})
+    except (json.JSONDecodeError, IOError, KeyError):
+        # If file is corrupted or invalid, return empty dict (fallback to alphabetical)
+        return {}
+
+
+def save_deck_order(order: Dict[str, int]) -> None:
+    """
+    Save deck order to configuration file.
+    
+    Args:
+        order: Dictionary mapping deck_id -> order (0-based index)
+    """
+    order_file = _get_deck_order_file()
+    
+    # Ensure parent directory exists
+    order_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Structure: {"order": {deck_id: position}}
+    data = {"order": order}
+    
+    # Write atomically using temp file + rename
+    try:
+        temp_fd, temp_path = tempfile.mkstemp(
+            suffix='.json',
+            dir=order_file.parent,
+            prefix='.order-',
+            text=True
+        )
+        
+        try:
+            with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            
+            os.replace(temp_path, order_file)
+        except Exception:
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+            raise
+    except OSError as e:
+        raise OSError(f"Failed to write deck order file: {e}")
 
 
 def _load_deck_from_file(file_path: Path) -> Deck:
@@ -71,7 +141,7 @@ def _load_deck_from_file(file_path: Path) -> Deck:
 
 
 def list_decks() -> List[DeckSummary]:
-    """Load all decks and return summaries."""
+    """Load all decks and return summaries, sorted by custom order if available."""
     decks_dir = _get_decks_directory()
     
     if not decks_dir.exists():
@@ -93,6 +163,26 @@ def list_decks() -> List[DeckSummary]:
             # Log error but continue loading other decks
             print(f"Warning: Failed to load deck from {json_file}: {e}")
             continue
+    
+    # Load custom order if available
+    order = load_deck_order()
+    
+    if order:
+        # Sort by order, then by id for decks not in order
+        def sort_key(deck: DeckSummary) -> tuple:
+            # Return (order, 0) if in order, else (max_order + 1, id) for alphabetical
+            deck_order = order.get(deck.id)
+            if deck_order is not None:
+                return (deck_order, 0)
+            else:
+                # Decks not in order go to end, sorted alphabetically
+                max_order = max(order.values()) if order else -1
+                return (max_order + 1, deck.id)
+        
+        summaries.sort(key=sort_key)
+    else:
+        # No custom order, sort alphabetically by id
+        summaries.sort(key=lambda d: d.id)
     
     return summaries
 

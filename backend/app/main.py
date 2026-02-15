@@ -8,7 +8,7 @@ import tempfile
 import os
 from pathlib import Path
 
-from .content_loader import list_decks, get_deck, resolve_deck_file_path
+from .content_loader import list_decks, get_deck, resolve_deck_file_path, save_deck_order
 from .schemas import DeckSummary, Deck
 
 # Import ai_deckgen service
@@ -41,6 +41,11 @@ class DeckUpdateRequest(BaseModel):
     title: str
     description: Optional[str] = None
     prompt: Optional[str] = None
+
+
+class DeckOrderRequest(BaseModel):
+    """Request model for deck order updates."""
+    deck_ids: list[str]
 
 
 @app.get("/api/health")
@@ -106,6 +111,52 @@ async def delete_deck(deck_id: str):
     
     # Return 204 No Content on success
     return Response(status_code=204)
+
+
+@app.put("/api/decks/order")
+async def update_deck_order(request: DeckOrderRequest):
+    """
+    Update the order of decks.
+    
+    Args:
+        request: Request containing ordered list of deck IDs
+        
+    Returns:
+        Success response
+    """
+    if not request.deck_ids:
+        raise HTTPException(
+            status_code=400,
+            detail="deck_ids cannot be empty"
+        )
+    
+    # Validate that all deck IDs exist by trying to resolve each one
+    invalid_ids = []
+    for deck_id in request.deck_ids:
+        try:
+            resolve_deck_file_path(deck_id)
+        except FileNotFoundError:
+            invalid_ids.append(deck_id)
+    
+    if invalid_ids:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Deck(s) not found: {', '.join(invalid_ids)}"
+        )
+    
+    # Build order dict: {deck_id: index}
+    order = {deck_id: index for index, deck_id in enumerate(request.deck_ids)}
+    
+    # Save order
+    try:
+        save_deck_order(order)
+    except OSError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to save deck order: {str(e)}"
+        )
+    
+    return {"status": "ok"}
 
 
 @app.put("/api/decks/{deck_id}", response_model=Deck)

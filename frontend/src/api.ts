@@ -38,8 +38,8 @@ type DeckUpdateRequest = {
 };
 
 type ApiError = {
-  error?: string;
-  detail?: string;
+  error?: string | object;
+  detail?: string | object;
   details?: string[];
 };
 
@@ -130,6 +130,40 @@ export async function updateDeck(id: string, updates: DeckUpdateRequest): Promis
   }
 
   return response.json();
+}
+
+export async function updateDeckOrder(deckIds: string[]): Promise<void> {
+  const response = await fetch(apiUrl('decks/order'), {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ deck_ids: deckIds }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    const apiError = errorData as ApiError;
+    
+    // Extract error message, handling cases where detail might be an object
+    let errorMessage = `Failed to update deck order: ${response.statusText}`;
+    if (apiError.detail) {
+      if (typeof apiError.detail === 'string') {
+        errorMessage = apiError.detail;
+      } else if (typeof apiError.detail === 'object') {
+        // If detail is an object, try to extract a message from it
+        const detailObj = apiError.detail as any;
+        errorMessage = detailObj.message || detailObj.error || JSON.stringify(detailObj);
+      }
+    } else if (apiError.error) {
+      errorMessage = typeof apiError.error === 'string' ? apiError.error : JSON.stringify(apiError.error);
+    }
+    
+    const error = new Error(errorMessage);
+    (error as any).status = response.status;
+    (error as any).details = apiError.details || [];
+    throw error;
+  }
 }
 
 // Export types for use in other files

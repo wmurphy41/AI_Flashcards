@@ -28,6 +28,31 @@
   cursor: pointer;
 }
 
+.deck-item-dragging {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border-color: #4a9eff;
+}
+
+.deck-list.reorder-mode .deck-item-container {
+  touch-action: pan-y;
+}
+
+.deck-list.reorder-mode .deck-item-container.reorder-mode-item {
+  cursor: grab;
+}
+
+.deck-list.reorder-mode .deck-item-container.reorder-mode-item:active {
+  cursor: grabbing;
+}
+
+.deck-list.reorder-mode .deck-item-container.dragging {
+  z-index: 1000;
+}
+
+.deck-list.reorder-mode .deck-item-container:not(.dragging) {
+  transition: transform 0.2s ease;
+}
+
 .deck-item-system {
   opacity: 0.6;
   background-color: rgba(128, 128, 128, 0.1);
