@@ -8,38 +8,53 @@
     {
       "id": "c1",
       "front": "Spotted Trout",
-      "back": "Silvery with black spots; Season: May-Oct; Min Length: 15 inches; Limit: 5/day"
+      "back": "Silver to grayish body with black spots; Season: Year-round; Min Length: 15 in; Daily Limit: 5."
     },
     {
       "id": "c2",
       "front": "Striped Bass",
-      "back": "Silver body with horizontal stripes; Season: Spring-Fall; Min Length: 18 inches; Limit: 2/day"
+      "back": "Silvery with dark horizontal stripes; Season: Spring & Fall; Min Length: 28 in; Daily Limit: 2."
     },
     {
       "id": "c3",
       "front": "White Perch",
-      "back": "Silvery-white with faint vertical bars; Season: Year-round; No min length; Limit: 30/day"
+      "back": "Silvery-white body with faint stripes; Season: Year-round; No min length; Daily Limit: 15."
     },
     {
       "id": "c4",
-      "front": "American Shad",
-      "back": "Deep-bodied, silvery with dark spots; Season: Spring; No retention in some areas; Catch and release encouraged"
+      "front": "Bluefish",
+      "back": "Blue-green back with silver sides; Season: Year-round; Min Length: 12 in; Daily Limit: 15."
     },
     {
       "id": "c5",
-      "front": "Atlantic Croaker",
-      "back": "Brownish-silver with black spots; Season: Year-round; No min length; Limit: 30/day"
+      "front": "American Eel",
+      "back": "Long, snake-like body, dark brown; Season: Year-round; Min Length: None; Daily Limit: 25."
     },
     {
       "id": "c6",
-      "front": "Bluefish",
-      "back": "Bluish-green back with silver sides; Season: Spring-Fall; Min Length: 12 inches; Limit: 15/day"
+      "front": "Atlantic Croaker",
+      "back": "Golden brown with croaking sound; Season: Year-round; Min Length: 8 in; Daily Limit: 15."
     },
     {
       "id": "c7",
-      "front": "White Bass",
-      "back": "Silver body with 6-8 horizontal stripes; Season: Spring; No min length; Limit: 30/day"
+      "front": "White Catfish",
+      "back": "Pale gray body with barbels; Season: Year-round; Min Length: None; Daily Limit: 15."
+    },
+    {
+      "id": "c8",
+      "front": "Bay Anchovy",
+      "back": "Small, slender silvery fish; Season: Year-round; No limits set; Common forage fish."
+    },
+    {
+      "id": "c9",
+      "front": "Atlantic Menhaden",
+      "back": "Silver with dark spot near gill; Season: Year-round; Commercial limits apply; Not for sport catch."
+    },
+    {
+      "id": "c10",
+      "front": "Weakfish",
+      "back": "Silver body with small spots; Season: Spring and Fall; Min Length: 14 in; Daily Limit: 5."
     }
   ],
-  "prompt": "Create a deck of the seven most common fish found in the Chesapeake Bay and its estuaries. Include only fish, no shellfish.  Include Spotted Trout in the list.  On the front of each card, put the name of the fish.  On the back, put a brief description of it's appearance and related fishery rules for the species (e.g., Season, Minimum Keep Length, Daily Catch Limit)."
+  "prompt": "Create a deck of the ten most common fish found in the Chesapeake Bay and its estuaries. Include only saltwater or brackish fish, no shellfish and no freshwater fish.  Include Spotted Trout in the list.  On the front of each card, put the name of the fish.  On the back, put a brief description of it's appearance and related fishery rules for the species (e.g., Season, Minimum Keep Length, Daily Catch Limit)."
 }

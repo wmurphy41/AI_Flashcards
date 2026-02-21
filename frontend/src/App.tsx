@@ -8,6 +8,7 @@ import { CreateDeck } from './components/CreateDeck'
 import { ManageDecks } from './components/ManageDecks'
 import { EditDeck } from './components/EditDeck'
 import { EditCards } from './components/EditCards'
+import { DeckPreview } from './components/DeckPreview'
 import {
   initSession,
   applyAnswer,
@@ -18,7 +19,7 @@ import {
 import { computeScores, computeBreakdown } from './sessionStats'
 import './App.css'
 
-type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'create-deck' | 'manage-decks' | 'edit-deck' | 'edit-cards'
+type View = 'list' | 'detail' | 'setup' | 'study' | 'results' | 'detailed-results' | 'deck-preview' | 'create-deck' | 'manage-decks' | 'edit-deck' | 'edit-cards'
 
 function App() {
   const [view, setView] = useState<View>('list')
@@ -73,7 +74,7 @@ function App() {
   useEffect(() => {
     if (selectedDeckId && decks.length > 0) {
       // Only check if we're in a view that depends on the deck existing
-      if (view === 'detail' || view === 'setup' || view === 'study' || view === 'results' || view === 'detailed-results') {
+      if (view === 'detail' || view === 'setup' || view === 'study' || view === 'results' || view === 'detailed-results' || view === 'deck-preview') {
         if (!isDeckAvailable(selectedDeckId)) {
           handleMissingDeck()
         }
@@ -124,6 +125,8 @@ function App() {
       setSessionOptions(null)
     } else if (view === 'detailed-results') {
       setView('results')
+    } else if (view === 'deck-preview') {
+      setView('detail')
     } else if (view === 'study' || view === 'results') {
       setView('detail')
       setSessionState(null)
@@ -437,6 +440,15 @@ function App() {
     )
   }
 
+  if (view === 'deck-preview' && selectedDeck) {
+    return (
+      <DeckPreview
+        deck={selectedDeck}
+        onBack={handleBack}
+      />
+    )
+  }
+
   if (view === 'results' && sessionState && selectedDeck) {
     const scores = computeScores(sessionState)
     const breakdown = computeBreakdown(selectedDeck.cards, sessionState)
@@ -563,9 +575,14 @@ function App() {
                   <p>This deck has no cards to study.</p>
                 </div>
               ) : (
-                <button className="study-button" onClick={handleStartStudy}>
-                  Start Study Session
-                </button>
+                <div className="preview-section-actions">
+                  <button className="study-button" onClick={() => setView('deck-preview')}>
+                    Preview
+                  </button>
+                  <button className="study-button" onClick={handleStartStudy}>
+                    Start Study Session
+                  </button>
+                </div>
               )}
             </div>
           )}

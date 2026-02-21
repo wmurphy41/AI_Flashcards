@@ -229,6 +229,16 @@
   font-style: italic;
 }
 
+.preview-section-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.preview-section-actions .study-button {
+  flex: 1;
+}
+
 .study-button {
   width: 100%;
   padding: 1rem 1.5rem;
