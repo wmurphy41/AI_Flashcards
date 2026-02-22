@@ -38,15 +38,17 @@ def regenerate_deck_cards(existing_deck_data: Dict, new_prompt: str) -> Dict:
     """
     Regenerate cards for an existing deck using a new prompt.
     
-    Preserves deck metadata (id, title, description, source, generated_at, etc.)
-    and replaces only the cards array.
+    Preserves deck id, source, generated_at, and other custom fields.
+    Replaces cards, prompt, title, and description with values from the
+    OpenAI response so they match the generated content.
     
     Args:
         existing_deck_data: Dictionary containing the existing deck data
         new_prompt: New prompt/description to use for card generation
         
     Returns:
-        Dictionary containing the deck data with new cards
+        Dictionary containing the deck data with new cards, prompt, title,
+        and description from the OpenAI response (overriding any existing values).
         
     Raises:
         ValueError: If validation fails after repair
@@ -57,15 +59,12 @@ def regenerate_deck_cards(existing_deck_data: Dict, new_prompt: str) -> Dict:
     generator = DeckGenerator()
     new_deck_data = generator.generate(new_prompt)
     
-    # Preserve existing deck metadata
-    # Keep: id, title, description, source, generated_at, and any other custom fields
-    # Replace: cards, prompt
+    # Preserve existing deck id, source, generated_at, etc.; replace cards, prompt, title, description
     regenerated_deck = existing_deck_data.copy()
     regenerated_deck['cards'] = new_deck_data['cards']
     regenerated_deck['prompt'] = new_prompt
-    
-    # Note: title and description from new_deck_data are ignored
-    # They should be updated separately via the update endpoint
+    regenerated_deck['title'] = new_deck_data['title']
+    regenerated_deck['description'] = new_deck_data.get('description', '')
     
     return regenerated_deck
 

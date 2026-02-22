@@ -1,0 +1,260 @@
+{
+  "id": "fifty-state-capitols",
+  "title": "Fifty State Capitals",
+  "description": "State names with their respective U.S. capitals",
+  "source": "openai:gpt-4.1-mini",
+  "generated_at": "2026-02-21",
+  "cards": [
+    {
+      "id": "c1",
+      "front": "Alabama",
+      "back": "Montgomery"
+    },
+    {
+      "id": "c2",
+      "front": "Alaska",
+      "back": "Juneau"
+    },
+    {
+      "id": "c3",
+      "front": "Arizona",
+      "back": "Phoenix"
+    },
+    {
+      "id": "c4",
+      "front": "Arkansas",
+      "back": "Little Rock"
+    },
+    {
+      "id": "c5",
+      "front": "California",
+      "back": "Sacramento"
+    },
+    {
+      "id": "c6",
+      "front": "Colorado",
+      "back": "Denver"
+    },
+    {
+      "id": "c7",
+      "front": "Connecticut",
+      "back": "Hartford"
+    },
+    {
+      "id": "c8",
+      "front": "Delaware",
+      "back": "Dover"
+    },
+    {
+      "id": "c9",
+      "front": "Florida",
+      "back": "Tallahassee"
+    },
+    {
+      "id": "c10",
+      "front": "Georgia",
+      "back": "Atlanta"
+    },
+    {
+      "id": "c11",
+      "front": "Hawaii",
+      "back": "Honolulu"
+    },
+    {
+      "id": "c12",
+      "front": "Idaho",
+      "back": "Boise"
+    },
+    {
+      "id": "c13",
+      "front": "Illinois",
+      "back": "Springfield"
+    },
+    {
+      "id": "c14",
+      "front": "Indiana",
+      "back": "Indianapolis"
+    },
+    {
+      "id": "c15",
+      "front": "Iowa",
+      "back": "Des Moines"
+    },
+    {
+      "id": "c16",
+      "front": "Kansas",
+      "back": "Topeka"
+    },
+    {
+      "id": "c17",
+      "front": "Kentucky",
+      "back": "Frankfort"
+    },
+    {
+      "id": "c18",
+      "front": "Louisiana",
+      "back": "Baton Rouge"
+    },
+    {
+      "id": "c19",
+      "front": "Maine",
+      "back": "Augusta"
+    },
+    {
+      "id": "c20",
+      "front": "Maryland",
+      "back": "Annapolis"
+    },
+    {
+      "id": "c21",
+      "front": "Massachusetts",
+      "back": "Boston"
+    },
+    {
+      "id": "c22",
+      "front": "Michigan",
+      "back": "Lansing"
+    },
+    {
+      "id": "c23",
+      "front": "Minnesota",
+      "back": "St. Paul"
+    },
+    {
+      "id": "c24",
+      "front": "Mississippi",
+      "back": "Jackson"
+    },
+    {
+      "id": "c25",
+      "front": "Missouri",
+      "back": "Jefferson City"
+    },
+    {
+      "id": "c26",
+      "front": "Montana",
+      "back": "Helena"
+    },
+    {
+      "id": "c27",
+      "front": "Nebraska",
+      "back": "Lincoln"
+    },
+    {
+      "id": "c28",
+      "front": "Nevada",
+      "back": "Carson City"
+    },
+    {
+      "id": "c29",
+      "front": "New Hampshire",
+      "back": "Concord"
+    },
+    {
+      "id": "c30",
+      "front": "New Jersey",
+      "back": "Trenton"
+    },
+    {
+      "id": "c31",
+      "front": "New Mexico",
+      "back": "Santa Fe"
+    },
+    {
+      "id": "c32",
+      "front": "New York",
+      "back": "Albany"
+    },
+    {
+      "id": "c33",
+      "front": "North Carolina",
+      "back": "Raleigh"
+    },
+    {
+      "id": "c34",
+      "front": "North Dakota",
+      "back": "Bismarck"
+    },
+    {
+      "id": "c35",
+      "front": "Ohio",
+      "back": "Columbus"
+    },
+    {
+      "id": "c36",
+      "front": "Oklahoma",
+      "back": "Oklahoma City"
+    },
+    {
+      "id": "c37",
+      "front": "Oregon",
+      "back": "Salem"
+    },
+    {
+      "id": "c38",
+      "front": "Pennsylvania",
+      "back": "Harrisburg"
+    },
+    {
+      "id": "c39",
+      "front": "Rhode Island",
+      "back": "Providence"
+    },
+    {
+      "id": "c40",
+      "front": "South Carolina",
+      "back": "Columbia"
+    },
+    {
+      "id": "c41",
+      "front": "South Dakota",
+      "back": "Pierre"
+    },
+    {
+      "id": "c42",
+      "front": "Tennessee",
+      "back": "Nashville"
+    },
+    {
+      "id": "c43",
+      "front": "Texas",
+      "back": "Austin"
+    },
+    {
+      "id": "c44",
+      "front": "Utah",
+      "back": "Salt Lake City"
+    },
+    {
+      "id": "c45",
+      "front": "Vermont",
+      "back": "Montpelier"
+    },
+    {
+      "id": "c46",
+      "front": "Virginia",
+      "back": "Richmond"
+    },
+    {
+      "id": "c47",
+      "front": "Washington",
+      "back": "Olympia"
+    },
+    {
+      "id": "c48",
+      "front": "West Virginia",
+      "back": "Charleston"
+    },
+    {
+      "id": "c49",
+      "front": "Wisconsin",
+      "back": "Madison"
+    },
+    {
+      "id": "c50",
+      "front": "Wyoming",
+      "back": "Cheyenne"
+    }
+  ],
+  "prompt": "Create a deck for the fifty state capitals of the United States.  Put the state name on the front and the capital on the back."
+}

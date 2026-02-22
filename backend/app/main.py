@@ -225,9 +225,11 @@ async def update_deck(deck_id: str, request: DeckUpdateRequest):
                 # Regenerate cards while preserving deck metadata
                 regenerated_deck = regenerate_deck_cards(deck_data, truncated_prompt)
                 
-                # Update deck_data with new cards and prompt
+                # Update deck_data with new cards, prompt, title, and description from OpenAI
                 deck_data['cards'] = regenerated_deck['cards']
                 deck_data['prompt'] = truncated_prompt
+                deck_data['title'] = regenerated_deck['title']
+                deck_data['description'] = regenerated_deck.get('description') or None
                 
             except ValueError as e:
                 # Validation errors - restore original cards and prompt
