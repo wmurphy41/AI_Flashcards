@@ -18,6 +18,8 @@ if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
 from ai_deckgen.service import create_deck, regenerate_deck_cards
+from ai_deckgen.storage import DeckStorage
+import re
 
 app = FastAPI()
 
@@ -319,6 +321,58 @@ async def update_deck(deck_id: str, request: DeckUpdateRequest):
         raise HTTPException(
             status_code=500,
             detail="Deck updated but failed to reload"
+        )
+
+
+def _normalize_deck_id_from_title(title: str) -> str:
+    """Normalize a title to kebab-case deck ID (lowercase, letters/numbers/hyphens only)."""
+    normalized = (title or "").lower()
+    normalized = re.sub(r'[^a-z0-9-]', '-', normalized)
+    normalized = re.sub(r'-+', '-', normalized).strip('-')
+    return normalized or "deck-copy"
+
+
+@app.post("/api/decks/{deck_id}/duplicate", response_model=Deck)
+async def duplicate_deck(deck_id: str):
+    """
+    Create an exact copy of a deck with title suffixed by ' (copy)'.
+    Returns the new deck (with new id and cards with new uids).
+    """
+    try:
+        deck_file = resolve_deck_file_path(deck_id)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Deck not found")
+
+    try:
+        with open(deck_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to read deck file: {str(e)}"
+        )
+
+    copy = json.loads(json.dumps(data))
+    copy["title"] = copy.get("title", "") + " (copy)"
+    copy["id"] = _normalize_deck_id_from_title(copy["title"])
+
+    try:
+        storage = DeckStorage()
+        storage.write_deck(copy)
+    except OSError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to write duplicate deck: {str(e)}"
+        )
+
+    new_id = copy["id"]
+    try:
+        new_deck = get_deck(new_id)
+        return new_deck
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Duplicate created but failed to load: {str(e)}"
         )
 
 

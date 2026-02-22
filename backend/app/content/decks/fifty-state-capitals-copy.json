@@ -1,0 +1,60 @@
+{
+  "id": "fifty-state-capitals-copy",
+  "title": "Canadian Provinces Capitals",
+  "description": "Capitals of the provinces of Canada",
+  "source": "openai:gpt-4.1-mini",
+  "generated_at": "2026-02-21",
+  "cards": [
+    {
+      "id": "c1",
+      "front": "Alberta",
+      "back": "Edmonton"
+    },
+    {
+      "id": "c2",
+      "front": "British Columbia",
+      "back": "Victoria"
+    },
+    {
+      "id": "c3",
+      "front": "Manitoba",
+      "back": "Winnipeg"
+    },
+    {
+      "id": "c4",
+      "front": "New Brunswick",
+      "back": "Fredericton"
+    },
+    {
+      "id": "c5",
+      "front": "Newfoundland and Labrador",
+      "back": "St. John's"
+    },
+    {
+      "id": "c6",
+      "front": "Nova Scotia",
+      "back": "Halifax"
+    },
+    {
+      "id": "c7",
+      "front": "Ontario",
+      "back": "Toronto"
+    },
+    {
+      "id": "c8",
+      "front": "Prince Edward Island",
+      "back": "Charlottetown"
+    },
+    {
+      "id": "c9",
+      "front": "Quebec",
+      "back": "Quebec City"
+    },
+    {
+      "id": "c10",
+      "front": "Saskatchewan",
+      "back": "Regina"
+    }
+  ],
+  "prompt": "Create a deck for the capitals of the provinces of Canada.  Put the province name on the front and the capital on the back."
+}

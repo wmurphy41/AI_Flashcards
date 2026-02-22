@@ -148,6 +148,27 @@ export async function updateDeck(id: string, updates: DeckUpdateRequest): Promis
   return response.json();
 }
 
+export async function duplicateDeck(deckId: string): Promise<Deck> {
+  const response = await fetch(apiUrl(`decks/${deckId}/duplicate`), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({}),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: response.statusText }));
+    const apiError = errorData as ApiError;
+    const error = new Error(getErrorMessage(apiError, `Failed to duplicate deck: ${response.statusText}`));
+    (error as any).status = response.status;
+    (error as any).details = apiError.details || [];
+    throw error;
+  }
+
+  return response.json();
+}
+
 export async function updateDeckOrder(deckIds: string[]): Promise<void> {
   const response = await fetch(apiUrl('decks/order'), {
     method: 'PUT',

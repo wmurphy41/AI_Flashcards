@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getDeck, updateDeck, type Deck } from '../api'
+import { getDeck, updateDeck, duplicateDeck, type Deck } from '../api'
 import { ConfirmDialog } from './ConfirmDialog'
 import './EditDeck.css'
 
@@ -8,15 +8,17 @@ interface EditDeckProps {
   onSave: () => void
   onCancel: () => void
   onEditCards: (deckId: string) => void
+  onDuplicateSuccess: (newDeck: Deck) => void
 }
 
-export function EditDeck({ deckId, onSave, onCancel, onEditCards }: EditDeckProps) {
+export function EditDeck({ deckId, onSave, onCancel, onEditCards, onDuplicateSuccess }: EditDeckProps) {
   const [deck, setDeck] = useState<Deck | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
+  const [isDuplicating, setIsDuplicating] = useState(false)
   
   // Editable values
   const [title, setTitle] = useState('')
@@ -106,6 +108,20 @@ export function EditDeck({ deckId, onSave, onCancel, onEditCards }: EditDeckProp
 
   const handleCancel = () => {
     onCancel()
+  }
+
+  const handleDuplicate = async () => {
+    if (!deck) return
+    setIsDuplicating(true)
+    setError(null)
+    try {
+      const newDeck = await duplicateDeck(deckId)
+      onDuplicateSuccess(newDeck)
+    } catch (err: any) {
+      setError(err.message || 'Failed to duplicate deck')
+    } finally {
+      setIsDuplicating(false)
+    }
   }
 
   if (loading) {
@@ -199,6 +215,13 @@ export function EditDeck({ deckId, onSave, onCancel, onEditCards }: EditDeckProp
               disabled={!hasChanges || saving || isRegenerating}
             >
               {promptEdited ? 'Save and Regenerate' : 'Save'}
+            </button>
+            <button
+              className="edit-duplicate-button"
+              onClick={handleDuplicate}
+              disabled={saving || isRegenerating || isDuplicating}
+            >
+              {isDuplicating ? 'Duplicating...' : 'Duplicate'}
             </button>
             <button
               className="edit-cancel-button"

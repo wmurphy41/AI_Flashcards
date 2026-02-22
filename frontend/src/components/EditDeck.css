@@ -45,6 +45,7 @@
 }
 
 .edit-save-button,
+.edit-duplicate-button,
 .edit-cancel-button {
   flex: 1;
   padding: 1rem 1.5rem;
@@ -77,19 +78,23 @@
   opacity: 0.6;
 }
 
+.edit-duplicate-button,
 .edit-cancel-button {
   background-color: #4a5568;
   color: white;
 }
 
+.edit-duplicate-button:hover:not(:disabled),
 .edit-cancel-button:hover:not(:disabled) {
   background-color: #3a4157;
 }
 
+.edit-duplicate-button:active:not(:disabled),
 .edit-cancel-button:active:not(:disabled) {
   background-color: #2d3448;
 }
 
+.edit-duplicate-button:disabled,
 .edit-cancel-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -118,15 +123,18 @@
     color: #888;
   }
 
+  .edit-duplicate-button,
   .edit-cancel-button {
     background-color: #e0e0e0;
     color: #1a1a1a;
   }
 
+  .edit-duplicate-button:hover:not(:disabled),
   .edit-cancel-button:hover:not(:disabled) {
     background-color: #d0d0d0;
   }
 
+  .edit-duplicate-button:active:not(:disabled),
   .edit-cancel-button:active:not(:disabled) {
     background-color: #c0c0c0;
   }

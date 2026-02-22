@@ -153,6 +153,21 @@ function App() {
     setView('edit-deck')
   }
 
+  const handleDuplicateSuccess = async (newDeck: Deck) => {
+    try {
+      await refreshDeckList()
+      setView('manage-decks')
+      setSelectedDeckId(null)
+      setToast({ message: `New deck successfully created with the title ${newDeck.title}.` })
+      setTimeout(() => {
+        setToast(null)
+      }, 3000)
+    } catch (err) {
+      setToast({ message: 'Deck duplicated but list could not be refreshed' })
+      setTimeout(() => setToast(null), 3000)
+    }
+  }
+
   const handleEditDeckSuccess = async () => {
     // Refresh deck list
     try {
@@ -406,6 +421,7 @@ function App() {
         onSave={handleEditDeckSuccess}
         onCancel={handleBack}
         onEditCards={handleEditCards}
+        onDuplicateSuccess={handleDuplicateSuccess}
       />
     )
   }
